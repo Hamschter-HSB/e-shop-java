@@ -2,14 +2,14 @@ package net.eshop.domain;
 
 public class Article {
 
-    private final String name;
     private final int articleNumber;
+    private final String name;
     private final String description;
     private int stock;
 
-    public Article(String name, int articleNumber, String description, int stock) {
-        this.name = name;
+    public Article(int articleNumber, String name, String description, int stock) {
         this.articleNumber = articleNumber;
+        this.name = name;
         this.description = description;
         this.stock = stock;
     }

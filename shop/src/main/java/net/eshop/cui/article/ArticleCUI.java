@@ -60,14 +60,14 @@ public class ArticleCUI {
     private void addArticle() {
 
         System.out.println("-----E-Shop/Article/Management/Add Article-----");
-        System.out.println("Write: [\"name\" \"articleNumber\" \"description\" \"stock\"] to add an article.");
+        System.out.println("Write: [\"articleNumber\" \"name\" \"description\" \"stock\"] to add an article.");
 
-        String name = scanner.next();
         int articleNumber = scanner.nextInt();
+        String name = scanner.next();
         String description = scanner.next();
         int stock = scanner.nextInt();
 
-        Article article = new Article(name, articleNumber, description, stock);
+        Article article = new Article(articleNumber, name, description, stock);
         dataPersister.create(article);
 
     }
