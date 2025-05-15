@@ -9,9 +9,9 @@ interface DAO<T> {
 
     void create(T type) throws IOException;
 
-    void read(int id);
+    T read(int id);
 
-    void update(int id);
+    void update(T type);
 
     void delete(int id);
 }

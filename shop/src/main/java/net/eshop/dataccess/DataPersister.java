@@ -17,5 +17,5 @@ public class DataPersister {
             ioException.printStackTrace();
         }
     }
-    private final DAO<Article> articleDAO = new ArticleDAOImpl();
+    private final DAO<Article> articleDAO = new ArticleFileDAOImpl();
 }
