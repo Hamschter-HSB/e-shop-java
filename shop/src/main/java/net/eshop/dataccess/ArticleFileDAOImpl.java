@@ -7,7 +7,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-class ArticleDAOImpl implements DAO<Article> {
+class ArticleFileDAOImpl implements DAO<Article> {
 
     @Override
     public void create(Article article) throws IOException {
@@ -28,12 +28,12 @@ class ArticleDAOImpl implements DAO<Article> {
     }
 
     @Override
-    public void read(int id) {
-
+    public Article read(int id) {
+        return null;
     }
 
     @Override
-    public void update(int id) {
+    public void update(Article article) {
 
     }
 
