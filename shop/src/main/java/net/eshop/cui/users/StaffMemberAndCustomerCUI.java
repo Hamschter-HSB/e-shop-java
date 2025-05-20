@@ -7,8 +7,10 @@ import net.eshop.domain.Customer;
 import net.eshop.domain.ShoppingBasket;
 import net.eshop.domain.StaffMember;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class StaffMemberAndCustomerCUI {
 
@@ -159,9 +161,10 @@ public class StaffMemberAndCustomerCUI {
 
         System.out.println("-----E-Shop/Customer/Shopping_Basket-----");
 
-        System.out.println("1. Edit amount of an article in the shopping basket");
+        System.out.println("1. Edit amount of an article in the shopping Basket");
         System.out.println("2. Clear Shopping Basket");
-        System.out.println("3. Back");
+        System.out.println("3. Buy all articles in the Shopping Basket");
+        System.out.println("4. Back");
 
         int choice = scanner.nextInt();
 
@@ -174,6 +177,8 @@ public class StaffMemberAndCustomerCUI {
                 dataPersister.getCustomer().getShoppingBasket().clear();
                 System.out.println("You've successfully cleared your Shopping Basket");
             case 3:
+                buyArticlesInShoppingCart();
+            case 4:
                 cuiManager.printMainMenu();
         }
     }
@@ -185,8 +190,16 @@ public class StaffMemberAndCustomerCUI {
         System.out.println("Enter the number of the Article for which you want to change the amount.");
         int articleNumber = scanner.nextInt();
 
-        System.out.println("Enter the new amount of the article");
+        System.out.println("Enter the new amount of the article.");
         int newAmount = scanner.nextInt();
+
+        Article article = dataPersister.readArticle(articleNumber);
+
+        while (newAmount > article.getStock()) {
+            System.out.println(article.getName() + " has " + article.getStock() + " items stored.");
+            System.out.println("Enter the new amount of the article.");
+            newAmount = scanner.nextInt();
+        }
 
         // TODO REMOVE and use own DAO. Temporary code
         ShoppingBasket shoppingBasketOfCurrentUser = dataPersister.getCustomer().getShoppingBasket();
@@ -210,5 +223,55 @@ public class StaffMemberAndCustomerCUI {
             System.out.println("description: " + article.getDescription());
             System.out.println("amount: " + value + "\n");
         });
+    }
+
+    private void buyArticlesInShoppingCart() {
+
+        // Remove articles from stock
+        dataPersister.getCustomer().getShoppingBasket().getArticleMap().forEach((id, amount) -> {
+
+            Article article = dataPersister.readArticle(id);
+            article.setStock(article.getStock() - amount);
+            dataPersister.updateArticle(article);
+        });
+
+        // Calculate total price
+
+
+        // Print invoice
+        printInvoice();
+
+        // Clear shopping cart
+
+        // TODO REMOVE and use own DAO. Temporary code
+        dataPersister.getCustomer().getShoppingBasket().clear();
+    }
+
+    private void printInvoice() {
+
+        //Die Rechnung enthält u.a. Kunde,
+        // Datum, die gekauften Artikel inkl.
+        // Stückzahl und Preisinformation sowie den Gesamtpreis.
+        Customer customer = dataPersister.getCustomer();
+        LocalDate date = LocalDate.now();
+
+        System.out.println("-----Your Invoice-----");
+
+        System.out.println("Customer: " + customer.getName());
+        System.out.println("Date: " + date+ "\n");
+
+        AtomicReference<Double> totalPrice = new AtomicReference<>((double) 0);
+
+        dataPersister.getCustomer().getShoppingBasket().getArticleMap().forEach((id, amount) -> {
+
+            Article article = dataPersister.readArticle(id);
+            totalPrice.updateAndGet(v -> v + article.getPrice() * amount);
+
+            System.out.println("Article: " + article.getName());
+            System.out.println("Amount: " + amount);
+            System.out.println("Price: " + article.getPrice() + "\n");
+        });
+        System.out.println("\n Total Price: " + totalPrice.get() + "\n");
+        System.out.println("\n-----Thank you for your purchase!-----");
     }
 }
