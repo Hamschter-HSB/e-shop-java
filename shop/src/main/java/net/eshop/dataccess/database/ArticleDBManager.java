@@ -23,7 +23,8 @@ public class ArticleDBManager {
                 + "articleNumber INTEGER PRIMARY KEY,"
                 + "name TEXT NOT NULL,"
                 + "description TEXT NOT NULL,"
-                + "stock INTEGER NOT NULL)";
+                + "stock INTEGER NOT NULL," +
+                    "price DOUBLE NOT NULL,)";
 
             statement.execute(sql);
             statement.close();
@@ -38,7 +39,7 @@ public class ArticleDBManager {
 
         try (
                 Statement stmt = connection.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT articleNumber, name, description, stock FROM articles");
+                ResultSet rs = stmt.executeQuery("SELECT articleNumber, name, description, stock, price FROM articles");
         ) {
 
             while (rs.next()) {
@@ -49,8 +50,9 @@ public class ArticleDBManager {
                 String name = rs.getString("name");
                 String description = rs.getString("description");
                 int stock = rs.getInt("stock");
+                double price = rs.getDouble(("price"));
 
-                Article article = new Article(articleNumber, name, description, stock);
+                Article article = new Article(articleNumber, name, description, stock, price);
 
                 // DEBUG ONLY
                 System.out.println("ID: " + articleNumber + "\nName: " + name + "\nDesc: " + description + "\nStock: " + stock);
@@ -74,12 +76,13 @@ public class ArticleDBManager {
 
             while (rs.next()) {
                 int articleNumberByDB = rs.getInt("articleNumber");
-                int stock = rs.getInt("stock");
                 String name = rs.getString("name");
                 String description = rs.getString("description");
+                int stock = rs.getInt("stock");
+                double price = rs.getDouble(("price"));
 
                 if (articleNumber == articleNumberByDB) {
-                    return new Article(articleNumber, name, description, stock);
+                    return new Article(articleNumber, name, description, stock, price);
                 }
             }
 
@@ -93,12 +96,13 @@ public class ArticleDBManager {
     public boolean createArticle(Article article) {
 
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO articles (name, description, stock) " +
-                    "VALUES (?, ?, ?)");
+            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO articles (name, description, stock, price) " +
+                    "VALUES (?, ?, ?, ?)");
 
             preparedStatement.setString(1, article.getName());
             preparedStatement.setString(2, article.getDescription());
             preparedStatement.setInt(3, article.getStock());
+            preparedStatement.setDouble(4, article.getPrice());
 
             preparedStatement.executeUpdate();
             preparedStatement.close();

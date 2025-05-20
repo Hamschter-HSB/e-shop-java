@@ -55,6 +55,7 @@ class ArticleFileDAOImpl implements DAO<Article> {
             bufferedReader.write(articleNumber + ".name=" + article.getName() + "\n");
             bufferedReader.write(articleNumber + ".description=" + article.getDescription() + "\n");
             bufferedReader.write(articleNumber + ".stock=" + article.getStock() + "\n");
+            bufferedReader.write(articleNumber + ".price=" + article.getPrice() + "\n");
         }
     }
 
@@ -75,16 +76,15 @@ class ArticleFileDAOImpl implements DAO<Article> {
                     duplicateArticles.add(line);
             });
 
-            assert duplicateArticles.size() == 4;
-
             final String regEx = ".*=";
 
             int articleNumber = Integer.parseInt(duplicateArticles.get(0).replaceAll(regEx, ""));
             String articleName = duplicateArticles.get(1).replaceAll(regEx, "");
             String articleDescription = duplicateArticles.get(2).replaceAll(regEx, "");
             int stock = Integer.parseInt(duplicateArticles.get(3).replaceAll(regEx, ""));
+            double price = Double.parseDouble(duplicateArticles.get(4).replaceAll(regEx, ""));
 
-            return new Article(articleNumber, articleName, articleDescription, stock);
+            return new Article(articleNumber, articleName, articleDescription, stock, price);
         }
     }
 
@@ -100,7 +100,7 @@ class ArticleFileDAOImpl implements DAO<Article> {
             AtomicInteger counter = new AtomicInteger();
 
             bufferedReader.lines().forEach(line -> {
-                if (counter.getAndIncrement() % 4 == 0) {
+                if (counter.getAndIncrement() % 5 == 0) {
                     articleIDS.add(Integer.parseInt(line.replaceAll(REG_EX, "")));
                 }
             });
@@ -135,7 +135,7 @@ class ArticleFileDAOImpl implements DAO<Article> {
         Path path = Paths.get(ARTICLE);
         List<String> allLines = Files.readAllLines(path);
 
-        allLines.removeIf(line -> line.equals(id + ".id=" + id) || line.startsWith(id + ".name=") || line.startsWith(id + ".description=") || line.startsWith(id + ".stock="));
+        allLines.removeIf(line -> line.equals(id + ".id=" + id) || line.startsWith(id + ".name=") || line.startsWith(id + ".description=") || line.startsWith(id + ".stock=") || line.startsWith(id + ".price="));
 
         Files.write(path, allLines);
     }
