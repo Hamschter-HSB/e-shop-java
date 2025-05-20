@@ -13,6 +13,10 @@ public class DataPersister {
     private final DAO<StaffMember> staffDAO = new StaffMembersFileDAOImpl();
     private final DAO<Customer> customerDAO = new CustomerFileDAOImpl();
 
+    // TODO REMOVE and use own DAO. Temporary code
+    int currentUserId = 1;
+    private final Customer customer = readCustomer(currentUserId);
+
     public void createArticle(Article article) {
 
         try {
@@ -78,5 +82,10 @@ public class DataPersister {
         } catch (IOException ioException) {
             throw new RuntimeException(ioException.getMessage());
         }
+    }
+
+    // TODO REMOVE and use own DAO. Temporary code
+    public Customer getCustomer() {
+        return customer;
     }
 }

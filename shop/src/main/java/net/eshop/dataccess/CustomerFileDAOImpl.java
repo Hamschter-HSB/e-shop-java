@@ -8,6 +8,7 @@ import java.io.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -78,7 +79,7 @@ public class CustomerFileDAOImpl implements DAO<Customer> {
             String password = duplicateArticles.get(2).replaceAll(regEx, "");
             String address = duplicateArticles.get(3).replaceAll(regEx, "");
 
-            return new Customer(number, userName, password, address, new ShoppingBasket(Collections.emptyList()));
+            return new Customer(number, userName, password, address, new ShoppingBasket(new HashMap<>()));
         }
     }
 

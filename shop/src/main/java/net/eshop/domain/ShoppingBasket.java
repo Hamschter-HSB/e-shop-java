@@ -1,21 +1,26 @@
 package net.eshop.domain;
 
 import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ShoppingBasket {
 
-    private final List<Article> articleList;
+    private Map<Integer, Integer> article;
 
-    public ShoppingBasket(List<Article> articleList) {
-        this.articleList = articleList;
+    public ShoppingBasket(HashMap<Integer, Integer> article) {
+        this.article = article;
     }
 
-    public void emptyBasket() {
-        articleList.clear();
+    public void clear() {
+        article.clear();
     }
 
-    public List<Article> getArticleList() {
-        return Collections.unmodifiableList(articleList);
+    public Map<Integer, Integer> getArticleMap() {
+        return Collections.unmodifiableMap(article);
+    }
+
+    public void addToArticleMap(Integer article, int amount) {
+        this.article.put(article, amount);
     }
 }
