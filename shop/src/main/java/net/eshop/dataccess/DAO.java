@@ -14,7 +14,7 @@ interface DAO<T> {
 
     List<T> readAll() throws IOException;
 
-    void update(T type);
+    void update(T type) throws IOException;
 
-    void delete(int id);
+    void delete(int id) throws IOException;
 }
