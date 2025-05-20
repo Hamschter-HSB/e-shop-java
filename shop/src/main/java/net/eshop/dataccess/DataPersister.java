@@ -6,8 +6,7 @@ import java.io.IOException;
 
 public class DataPersister {
 
-    public static final String DATA_PATH = "Data";
-    public static final String ARTICLE = "Articles";
+    private final DAO<Article> articleDAO = new ArticleFileDAOImpl();
 
     public void create(Article article) {
 
@@ -17,5 +16,4 @@ public class DataPersister {
             ioException.printStackTrace();
         }
     }
-    private final DAO<Article> articleDAO = new ArticleFileDAOImpl();
 }
