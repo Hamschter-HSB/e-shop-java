@@ -108,14 +108,15 @@ public class ArticleCUI {
     private void addArticle() {
 
         System.out.println("-----E-Shop/Article/Management/Add article-----");
-        System.out.println("Write: [\"articleNumber\" \"name\" \"description\" \"stock\"] to add an article.");
+        System.out.println("Write: [\"articleNumber\" \"name\" \"description\" \"stock\" \"price\"] to add an article.");
 
         int articleNumber = scanner.nextInt();
         String name = scanner.next();
         String description = scanner.next();
         int stock = scanner.nextInt();
+        double price = scanner.nextDouble();
 
-        Article article = new Article(articleNumber, name, description, stock);
+        Article article = new Article(articleNumber, name, description, stock, price);
         dataPersister.createArticle(article);
     }
 
@@ -212,6 +213,12 @@ public class ArticleCUI {
         int articleAmount = scanner.nextInt();
 
         Article article = dataPersister.readArticle(articleNumber);
+
+        while (articleAmount > article.getStock()) {
+            System.out.println(article.getName() + " has " + article.getStock() + " items stored.");
+            System.out.println("Enter the amount of the article.");
+            articleAmount = scanner.nextInt();
+        }
 
         dataPersister.getCustomer().getShoppingBasket().addToArticleMap(article.getArticleNumber(), articleAmount);
     }
