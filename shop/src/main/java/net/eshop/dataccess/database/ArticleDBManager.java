@@ -12,6 +12,24 @@ public class ArticleDBManager {
 
     public ArticleDBManager(Connection connection) {
         this.connection = connection;
+        createTableIfNotExists();
+    }
+
+    private void createTableIfNotExists() {
+        try {
+            Statement statement = connection.createStatement();
+
+            String sql = "CREATE TABLE IF NOT EXISTS articles ("
+                + "articleNumber INTEGER PRIMARY KEY,"
+                + "name TEXT NOT NULL,"
+                + "description TEXT NOT NULL,"
+                + "stock INTEGER NOT NULL)";
+
+            statement.execute(sql);
+            statement.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public List<Article> readArticles() throws SQLException {
