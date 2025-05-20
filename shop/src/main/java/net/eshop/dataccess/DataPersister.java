@@ -7,7 +7,7 @@ import java.io.IOException;
 public class DataPersister {
 
     public static final String DATA_PATH = "Data";
-    public static final String ARTICLE = "Article";
+    public static final String ARTICLE = "Articles";
 
     public void create(Article article) {
 
