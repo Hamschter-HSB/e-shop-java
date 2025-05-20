@@ -2,11 +2,12 @@ package net.eshop.cui.users;
 
 import net.eshop.cui.CUIManager;
 import net.eshop.dataccess.DataPersister;
+import net.eshop.domain.Article;
 import net.eshop.domain.Customer;
 import net.eshop.domain.ShoppingBasket;
 import net.eshop.domain.StaffMember;
 
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class StaffMemberAndCustomerCUI {
@@ -14,10 +15,11 @@ public class StaffMemberAndCustomerCUI {
     private final Scanner scanner = new Scanner(System.in);
 
     private final CUIManager cuiManager;
-    private final DataPersister dataPersister = new DataPersister();
+    private final DataPersister dataPersister;
 
-    public StaffMemberAndCustomerCUI(CUIManager cuiManager) {
+    public StaffMemberAndCustomerCUI(CUIManager cuiManager, DataPersister dataPersister) {
         this.cuiManager = cuiManager;
+        this.dataPersister = dataPersister;
     }
 
     public void loginOption() {
@@ -125,6 +127,7 @@ public class StaffMemberAndCustomerCUI {
             System.out.println("You've successfully logged in!");
 
             System.setProperty("CURRENT_USER", "CUSTOMER");
+            System.setProperty("CURRENT_USER_ID", String.valueOf(number));
 
             cuiManager.printMainMenu();
         } else
@@ -146,9 +149,66 @@ public class StaffMemberAndCustomerCUI {
         System.out.println("Please input an address");
         String address = scanner.next();
 
-        Customer customer = new Customer(number, username, password, address, new ShoppingBasket(Collections.emptyList()));
+        Customer customer = new Customer(number, username, password, address, new ShoppingBasket(new HashMap<>()));
         dataPersister.createCustomer(customer);
 
         System.out.println("You've successfully registered as a new customer with the username" + username + " !");
+    }
+
+    public void printShoppingBasketManagementMenu() {
+
+        System.out.println("-----E-Shop/Customer/Shopping_Basket-----");
+
+        System.out.println("1. Edit amount of an article in the shopping basket");
+        System.out.println("2. Clear Shopping Basket");
+        System.out.println("3. Back");
+
+        int choice = scanner.nextInt();
+
+        switch (choice) {
+            case 1:
+                printEditAmountOfAnArticleInShoppingBasketMenu();
+                break;
+            case 2:
+                // TODO REMOVE and use own DAO. Temporary code
+                dataPersister.getCustomer().getShoppingBasket().clear();
+                System.out.println("You've successfully cleared your Shopping Basket");
+            case 3:
+                cuiManager.printMainMenu();
+        }
+    }
+
+    public void printEditAmountOfAnArticleInShoppingBasketMenu() {
+
+        printShoppingBasket();
+
+        System.out.println("Enter the number of the Article for which you want to change the amount.");
+        int articleNumber = scanner.nextInt();
+
+        System.out.println("Enter the new amount of the article");
+        int newAmount = scanner.nextInt();
+
+        // TODO REMOVE and use own DAO. Temporary code
+        ShoppingBasket shoppingBasketOfCurrentUser = dataPersister.getCustomer().getShoppingBasket();
+        shoppingBasketOfCurrentUser.addToArticleMap(articleNumber, newAmount);
+
+        printShoppingBasketManagementMenu();
+    }
+
+    //TODO DEBUG why does this method not print the expected phrases?
+    private void printShoppingBasket() {
+
+        System.out.println("-----E-Shop/Customer/Shopping-Basket/Articles-----");
+
+        ShoppingBasket shoppingBasketOfCurrentUser = dataPersister.getCustomer().getShoppingBasket();
+
+        shoppingBasketOfCurrentUser.getArticleMap().forEach((key, value) -> {
+
+            Article article = dataPersister.readArticle(key);
+            System.out.println("id: " + article.getArticleNumber());
+            System.out.println("name: " + article.getName());
+            System.out.println("description: " + article.getDescription());
+            System.out.println("amount: " + value + "\n");
+        });
     }
 }
