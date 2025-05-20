@@ -49,7 +49,7 @@ public class ArticleCUI {
 
         System.out.println("-----E-Shop/Article/Management/Manage articles-----");
 
-        List<Article> articles = dataPersister.readAll();
+        List<Article> articles = dataPersister.readAllArticles();
         articles.forEach(article -> {
             printArticle(article);
             System.out.println();
@@ -96,7 +96,7 @@ public class ArticleCUI {
         int stock = scanner.nextInt();
 
         Article article = new Article(articleNumber, name, description, stock);
-        dataPersister.create(article);
+        dataPersister.createArticle(article);
     }
 
     private void removeArticle() {
@@ -157,7 +157,7 @@ public class ArticleCUI {
         System.out.println("Write: [\"articleNumber\"] to find the article.");
 
         int articleNumber = scanner.nextInt();
-        Article read = dataPersister.read(articleNumber);
+        Article read = dataPersister.readArticle(articleNumber);
         printArticle(read);
     }
 

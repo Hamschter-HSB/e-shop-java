@@ -13,7 +13,7 @@ public class DataPersister {
     private final DAO<StaffMember> staffDAO = new StaffMembersFileDAOImpl();
     private final DAO<Customer> customerDAO = new CustomerFileDAOImpl();
 
-    public void create(Article article) {
+    public void createArticle(Article article) {
 
         try {
             articleDAO.create(article);
@@ -22,7 +22,7 @@ public class DataPersister {
         }
     }
 
-    public Article read(int id) {
+    public Article readArticle(int id) {
         try {
             return articleDAO.read(id);
         } catch (IOException ioException) {
@@ -30,7 +30,7 @@ public class DataPersister {
         }
     }
 
-    public List<Article> readAll() {
+    public List<Article> readAllArticles() {
         try {
             return articleDAO.readAll();
         } catch (IOException ioException) {

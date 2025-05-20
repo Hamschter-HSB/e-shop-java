@@ -19,6 +19,10 @@ public class CUIManager {
     public void printMainMenu() {
 
         System.out.println("-----E-Shop-----");
+
+        if (currentUserIsStaffMember())
+            System.out.println("0. Staff menu");
+
         System.out.println("1. Article");
         System.out.println("2. Exit");
 
