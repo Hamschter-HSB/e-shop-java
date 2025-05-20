@@ -3,17 +3,27 @@ package net.eshop.dataccess;
 import net.eshop.dataccess.database.ArticleDBManager;
 import net.eshop.domain.Article;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 class ArticleDBDAOImpl implements DAO<Article> {
 
-    private ArticleDBManager articleDatabaseManager;
+    private static final String URL = "jdbc:sqlite:articles.db";
+    private static final Connection CONNECTION;
+
+    static {
+        try {
+            CONNECTION = DriverManager.getConnection(URL);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private final ArticleDBManager articleDatabaseManager = new ArticleDBManager(CONNECTION);
 
     @Override
     public void create(Article article) throws IOException {
