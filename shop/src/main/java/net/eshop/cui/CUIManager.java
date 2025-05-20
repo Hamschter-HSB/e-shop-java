@@ -23,7 +23,7 @@ public class CUIManager {
         if (currentUserIsStaffMember())
             System.out.println("0. Staff menu");
 
-        System.out.println("1. Article");
+        System.out.println("1. Browse Articles");
         System.out.println("2. Exit");
 
 
@@ -35,7 +35,7 @@ public class CUIManager {
                         staffMemberAndCustomerCUI.printStaffMenu();
                     break;
                 case 1:
-                    articleCUI.printSubMenu();
+                    articleCUI.browseArticlesMenu();
                     break;
                 case 2:
                     break;
@@ -43,6 +43,10 @@ public class CUIManager {
                     System.out.println("Invalid choice. Program terminated");
             }
         }
+    }
+
+    public ArticleCUI getArticleCUI() {
+        return articleCUI;
     }
 
     private boolean currentUserIsStaffMember() {

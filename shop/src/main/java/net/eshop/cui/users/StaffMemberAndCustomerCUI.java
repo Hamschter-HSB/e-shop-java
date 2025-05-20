@@ -70,8 +70,9 @@ public class StaffMemberAndCustomerCUI {
 
         System.out.println("-----E-Shop/StaffMember-----");
         System.out.println("1. register new staff member");
-        System.out.println("2. main menu");
-        System.out.println("3. close");
+        System.out.println("2. manage articles");
+        System.out.println("3. main menu");
+        System.out.println("4. close");
 
         if (scanner.hasNextInt()) {
             int choice = scanner.nextInt();
@@ -80,9 +81,11 @@ public class StaffMemberAndCustomerCUI {
                 case 1:
                     registerNewStaffMember();
                 case 2:
+                    cuiManager.getArticleCUI().printArticleManagementMenu();
+                case 3:
                     cuiManager.printMainMenu();
                     break;
-                case 3:
+                case 4:
             }
         }
 
@@ -129,6 +132,7 @@ public class StaffMemberAndCustomerCUI {
     }
 
     public void registerAsCustomer() {
+
         System.out.println("-----E-Shop/Register-----");
         System.out.println("Please input a number.");
         int number = scanner.nextInt();
