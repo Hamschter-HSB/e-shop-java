@@ -36,7 +36,7 @@ public class ArticleCUI {
                     System.out.println("-----------------------");
                     printSubMenu();
                 case 2:
-                    managementMenu();
+                    printArticleManagementMenu();
                     break;
                 case 3:
                     cuiManager.printMainMenu();
@@ -57,9 +57,9 @@ public class ArticleCUI {
 
     }
 
-    private void managementMenu() {
+    public void printArticleManagementMenu() {
 
-        System.out.println("-----E-Shop/Article/Management-----");
+        System.out.println("-----E-Shop/Articles/Management-----");
         System.out.println("1. Add article");
         System.out.println("2. Find article");
         System.out.println("3. Remove article");
@@ -77,7 +77,7 @@ public class ArticleCUI {
                 case 3:
                     removeArticle();
                 case 4:
-                    //editArticle();
+                    editArticle();
                 case 5:
                     printSubMenu();
                     break;
@@ -126,7 +126,7 @@ public class ArticleCUI {
 //        System.out.println("stock: " + article.getStock());
 
         System.out.println("-----------------------------");
-        System.out.println("-----E-Shop/Article/Management/Edit article with ID: "+articleNumber);
+        System.out.println("-----E-Shop/Article/Management/Edit article with ID: " + articleNumber);
         System.out.println("1. Change Name");
         System.out.println("2. Change Description");
         System.out.println("3. Change Stock");
@@ -143,17 +143,32 @@ public class ArticleCUI {
                     //changeDesc(); // TODO
                     editArticle();
                 case 3:
-                    //changeStock(); // TODO
-                    editArticle();
+                    changeStock();
                 case 4:
-                    managementMenu();
+                    printArticleManagementMenu();
             }
         }
     }
 
+    private void changeStock() {
+
+        System.out.println("-----E-Shop/Article/Management/Edit stock-----");
+
+        System.out.println("Write the article number you want to edit the article stock for.");
+        int id = scanner.nextInt();
+
+        System.out.println("Write the new stock amount.");
+        int stock = scanner.nextInt();
+
+        Article article = dataPersister.readArticle(id);
+        article.setStock(stock);
+
+        dataPersister.updateArticle(article);
+    }
+
     private void readArticle() {
 
-        System.out.println("-----E-Shop/Article/Management/Read article-----");
+        System.out.println("-----E-Shop/Article/Management/Find article-----");
         System.out.println("Write: [\"articleNumber\"] to find the article.");
 
         int articleNumber = scanner.nextInt();

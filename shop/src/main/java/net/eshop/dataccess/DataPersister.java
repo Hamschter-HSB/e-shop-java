@@ -38,6 +38,14 @@ public class DataPersister {
         }
     }
 
+    public void updateArticle(Article article) {
+        try {
+            articleDAO.update(article);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     /* StaffMember */
 
     public void createStaffMember(StaffMember staffMember) {

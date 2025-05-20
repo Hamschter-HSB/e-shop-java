@@ -4,6 +4,9 @@ import net.eshop.domain.Article;
 import net.eshop.exceptions.ArticleNotFoundException;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -114,13 +117,27 @@ class ArticleFileDAOImpl implements DAO<Article> {
     }
 
     @Override
-    public void update(Article article) {
+    public void update(Article article) throws IOException {
+
+        delete(article.getArticleNumber());
+        create(article);
 
     }
 
     @Override
-    public void delete(int id) {
+    public void delete(int id) throws IOException {
 
+        if (!containsArticle(id)) {
+            logger.info(MessageFormat.format("Article with articleNumber {0} does not exist!", id));
+            return;
+        }
+
+        Path path = Paths.get(ARTICLE);
+        List<String> allLines = Files.readAllLines(path);
+
+        allLines.removeIf(line -> line.equals(id + ".id=" + id) || line.startsWith(id + ".name=") || line.startsWith(id + ".description=") || line.startsWith(id + ".stock="));
+
+        Files.write(path, allLines);
     }
 
     private boolean containsArticle(int id) throws IOException {
