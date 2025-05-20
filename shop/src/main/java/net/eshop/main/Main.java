@@ -9,6 +9,6 @@ public class Main {
         System.out.println("E-Shop started:");
 
         CUIManager manager = new CUIManager();
-        manager.printMainMenu();
+        manager.printLoginOption();
     }
 }
