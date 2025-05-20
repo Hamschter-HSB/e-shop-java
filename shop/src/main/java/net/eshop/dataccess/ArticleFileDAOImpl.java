@@ -1,32 +1,47 @@
 package net.eshop.dataccess;
 
 import net.eshop.domain.Article;
+import net.eshop.exceptions.ArticleNotFoundException;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
 
 class ArticleFileDAOImpl implements DAO<Article> {
+
+    private static final Logger logger = Logger.getLogger(ArticleFileDAOImpl.class.getName());
+
+    private final File file = new File(DataPersister.ARTICLE);
 
     @Override
     public void create(Article article) throws IOException {
 
-        File file = new File(DataPersister.ARTICLE);
+        int articleNumber = article.getArticleNumber();
+
+        if(containsArticle(articleNumber)) {
+            logger.info(MessageFormat.format("Article with articleNumber {0} does already exist!", articleNumber));
+            return;
+        }
 
         try (FileWriter fileWriter = new FileWriter(file, true);
              BufferedWriter bufferedReader = new BufferedWriter(fileWriter)) {
 
             bufferedReader.write("\n");
-            bufferedReader.write(article.getArticleNumber() + "\n");
-            bufferedReader.write(article.getName() + "\n");
-            bufferedReader.write(article.getDescription() + "\n");
-            bufferedReader.write(article.getStock() + "\n");
+            bufferedReader.write( articleNumber + ".id=" + articleNumber + "\n");
+            bufferedReader.write(articleNumber + ".name=" + article.getName() + "\n");
+            bufferedReader.write(articleNumber + ".description=" + article.getDescription() + "\n");
+            bufferedReader.write(articleNumber + ".stock=" + article.getStock() + "\n");
         }
     }
 
     @Override
-    public Article read(int id) {
+    public Article read(int id) throws IOException {
+
+        if(!containsArticle(id))
+            throw new ArticleNotFoundException(MessageFormat.format("No article with articleNumber {0}", id));
+
         return null;
     }
 
@@ -38,5 +53,23 @@ class ArticleFileDAOImpl implements DAO<Article> {
     @Override
     public void delete(int id) {
 
+    }
+
+    private boolean containsArticle(int id) throws IOException {
+
+        try (FileReader fileReader = new FileReader(file)) {
+
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            List<String> duplicateArticles = new ArrayList<>();
+
+            bufferedReader.lines().forEach(line -> {
+
+                if(line.startsWith(String.valueOf(id) + "."))
+                    duplicateArticles.add(line);
+            });
+
+            //if the list is not empty. a article is a duplicate
+            return !duplicateArticles.isEmpty();
+        }
     }
 }
