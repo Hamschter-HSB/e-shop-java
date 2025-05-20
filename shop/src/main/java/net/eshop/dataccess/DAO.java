@@ -9,7 +9,7 @@ interface DAO<T> {
 
     void create(T type) throws IOException;
 
-    T read(int id);
+    T read(int id) throws IOException;
 
     void update(T type);
 
