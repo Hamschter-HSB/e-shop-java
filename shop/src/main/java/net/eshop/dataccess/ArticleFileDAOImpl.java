@@ -14,12 +14,10 @@ class ArticleFileDAOImpl implements DAO<Article> {
 
         File file = new File(DataPersister.ARTICLE);
 
-        if (!file.exists())
-            file.createNewFile();
-
-        try (FileWriter fileWriter = new FileWriter(file);
+        try (FileWriter fileWriter = new FileWriter(file, true);
              BufferedWriter bufferedReader = new BufferedWriter(fileWriter)) {
 
+            bufferedReader.write("\n");
             bufferedReader.write(article.getArticleNumber() + "\n");
             bufferedReader.write(article.getName() + "\n");
             bufferedReader.write(article.getDescription() + "\n");
