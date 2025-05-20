@@ -57,6 +57,9 @@ class ArticleFileDAOImpl implements DAO<Article> {
         if (!containsArticle(id))
             throw new ArticleNotFoundException(MessageFormat.format("No article with articleNumber {0}", id));
 
+
+
+
         return null;
     }
 
@@ -79,7 +82,7 @@ class ArticleFileDAOImpl implements DAO<Article> {
 
             bufferedReader.lines().forEach(line -> {
 
-                if (line.startsWith(String.valueOf(id) + "."))
+                if (line.startsWith(id + "."))
                     duplicateArticles.add(line);
             });
 
