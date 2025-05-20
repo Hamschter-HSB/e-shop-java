@@ -4,6 +4,7 @@ import net.eshop.cui.CUIManager;
 import net.eshop.dataccess.DataPersister;
 import net.eshop.domain.Article;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class ArticleCUI {
@@ -28,11 +29,31 @@ public class ArticleCUI {
             int choice = scanner.nextInt();
 
             switch (choice) {
-                case 1: printSubMenu(); break;
-                case 2: managementMenu(); break;
-                case 3: cuiManager.printMainMenu();
+                case 1:
+                    readAllArticles();
+                    System.out.println("-----------------------");
+                    System.out.println("-----------------------");
+                    System.out.println("-----------------------");
+                    printSubMenu();
+                case 2:
+                    managementMenu();
+                    break;
+                case 3:
+                    cuiManager.printMainMenu();
             }
         }
+
+    }
+
+    private void readAllArticles() {
+
+        System.out.println("-----E-Shop/Article/Management/Manage articles-----");
+
+        List<Article> articles = dataPersister.readAll();
+        articles.forEach(article -> {
+            printArticle(article);
+            System.out.println();
+        });
 
     }
 
@@ -40,26 +61,33 @@ public class ArticleCUI {
 
         System.out.println("-----E-Shop/Article/Management-----");
         System.out.println("1. Add article");
-        System.out.println("2. Remove article");
-        System.out.println("3. Edit stock");
-        System.out.println("4. Back");
+        System.out.println("2. Find article");
+        System.out.println("3. Remove article");
+        System.out.println("4. Edit stock");
+        System.out.println("5. Back");
 
         if (scanner.hasNextInt()) {
             int choice = scanner.nextInt();
 
             switch (choice) {
-                case 1: addArticle();
-                case 2: break;
-                case 3: break;
-                case 4: printSubMenu(); break;
+                case 1:
+                    addArticle();
+                case 2:
+                    readArticle();
+                case 3:
+                    removeArticle();
+                case 4:
+                    //editArticle();
+                case 5:
+                    printSubMenu();
+                    break;
             }
         }
-        // end of scanner
     }
 
     private void addArticle() {
 
-        System.out.println("-----E-Shop/Article/Management/Add Article-----");
+        System.out.println("-----E-Shop/Article/Management/Add article-----");
         System.out.println("Write: [\"articleNumber\" \"name\" \"description\" \"stock\"] to add an article.");
 
         int articleNumber = scanner.nextInt();
@@ -69,6 +97,74 @@ public class ArticleCUI {
 
         Article article = new Article(articleNumber, name, description, stock);
         dataPersister.create(article);
+    }
 
+    private void removeArticle() {
+
+        System.out.println("-----E-Shop/Article/Management/Remove article by ID-----");
+        System.out.println("Write: [\"articleNumber\"] to remove an article.");
+
+        int articleNumber = scanner.nextInt();
+
+
+        // TODO: Remove Obj by ID
+    }
+
+    private void editArticle() {
+
+        System.out.println("-----E-Shop/Article/Management/Edit article by ID-----");
+        System.out.println("Write: [\"articleNumber\"] to edit an article.");
+
+        int articleNumber = scanner.nextInt();
+
+        // TODO: get article obj by id
+
+//        System.out.println("-----E-Shop/Article/Management/Edit article with ID: "+articleNumber);
+//        System.out.println("id: " + article.getArticleNumber());
+//        System.out.println("name: " + article.getName());
+//        System.out.println("description: " + article.getDescription());
+//        System.out.println("stock: " + article.getStock());
+
+        System.out.println("-----------------------------");
+        System.out.println("-----E-Shop/Article/Management/Edit article with ID: "+articleNumber);
+        System.out.println("1. Change Name");
+        System.out.println("2. Change Description");
+        System.out.println("3. Change Stock");
+        System.out.println("4. Back");
+
+        if (scanner.hasNextInt()) {
+            int choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    //changeName(); // TODO
+                    editArticle();
+                case 2:
+                    //changeDesc(); // TODO
+                    editArticle();
+                case 3:
+                    //changeStock(); // TODO
+                    editArticle();
+                case 4:
+                    managementMenu();
+            }
+        }
+    }
+
+    private void readArticle() {
+
+        System.out.println("-----E-Shop/Article/Management/Read article-----");
+        System.out.println("Write: [\"articleNumber\"] to find the article.");
+
+        int articleNumber = scanner.nextInt();
+        Article read = dataPersister.read(articleNumber);
+        printArticle(read);
+    }
+
+    private void printArticle(Article article) {
+        System.out.println("id: " + article.getArticleNumber());
+        System.out.println("name: " + article.getName());
+        System.out.println("description: " + article.getDescription());
+        System.out.println("stock: " + article.getStock());
     }
 }

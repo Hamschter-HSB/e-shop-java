@@ -48,7 +48,6 @@ class ArticleFileDAOImpl implements DAO<Article> {
         try (FileWriter fileWriter = new FileWriter(file, true);
              BufferedWriter bufferedReader = new BufferedWriter(fileWriter)) {
 
-            bufferedReader.write("\n");
             bufferedReader.write(articleNumber + ".id=" + articleNumber + "\n");
             bufferedReader.write(articleNumber + ".name=" + article.getName() + "\n");
             bufferedReader.write(articleNumber + ".description=" + article.getDescription() + "\n");
@@ -62,7 +61,29 @@ class ArticleFileDAOImpl implements DAO<Article> {
         if (!containsArticle(id))
             throw new ArticleNotFoundException(MessageFormat.format("No article with articleNumber {0}", id));
 
+        try (FileReader fileReader = new FileReader(file)) {
 
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            List<String> duplicateArticles = new ArrayList<>();
+
+            bufferedReader.lines().forEach(line -> {
+
+                if (line.startsWith(id + "."))
+                    duplicateArticles.add(line);
+            });
+
+            assert duplicateArticles.size() == 4;
+
+            final String regEx = ".*=";
+
+            int articleNumber = Integer.parseInt(duplicateArticles.get(0).replaceAll(regEx, ""));
+            String articleName = duplicateArticles.get(1).replaceAll(regEx, "");
+            String articleDescription = duplicateArticles.get(2).replaceAll(regEx, "");
+            int stock = Integer.parseInt(duplicateArticles.get(3).replaceAll(regEx, ""));
+
+            return new Article(articleNumber, articleName, articleDescription, stock);
+        }
+    }
 
     @Override
     public List<Article> readAll() throws IOException {
