@@ -12,10 +12,11 @@ public class ArticleCUI {
     private final Scanner scanner = new Scanner(System.in);
 
     private final CUIManager cuiManager;
-    private final DataPersister dataPersister = new DataPersister();
+    private final DataPersister dataPersister;
 
-    public ArticleCUI(CUIManager cuiManager) {
+    public ArticleCUI(CUIManager cuiManager, DataPersister dataPersister) {
         this.cuiManager = cuiManager;
+        this.dataPersister = dataPersister;
     }
 
     public void printSubMenu() {
@@ -80,6 +81,25 @@ public class ArticleCUI {
                     editArticle();
                 case 5:
                     printSubMenu();
+                    break;
+            }
+        }
+    }
+
+    public void browseArticlesMenu() {
+
+        System.out.println("-----E-Shop/Articles/Browse-----");
+        System.out.println("1. Add article");
+        System.out.println("2. Back");
+
+        if (scanner.hasNextInt()) {
+            int choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    addArticleToShoppingBasket();
+                case 2:
+                    cuiManager.printMainMenu();
                     break;
             }
         }
@@ -181,5 +201,18 @@ public class ArticleCUI {
         System.out.println("name: " + article.getName());
         System.out.println("description: " + article.getDescription());
         System.out.println("stock: " + article.getStock());
+    }
+
+    private void addArticleToShoppingBasket() {
+
+        System.out.println("Please type the number of the article that you wish to add to your Basket.");
+        int articleNumber = scanner.nextInt();
+
+        System.out.println("Please choose how many Items of this number you wish to add to your Basket.");
+        int articleAmount = scanner.nextInt();
+
+        Article article = dataPersister.readArticle(articleNumber);
+
+        dataPersister.getCustomer().getShoppingBasket().addToArticleMap(article.getArticleNumber(), articleAmount);
     }
 }

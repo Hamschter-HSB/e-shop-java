@@ -2,6 +2,7 @@ package net.eshop.cui;
 
 import net.eshop.cui.article.ArticleCUI;
 import net.eshop.cui.users.StaffMemberAndCustomerCUI;
+import net.eshop.dataccess.DataPersister;
 
 import java.util.Scanner;
 
@@ -9,8 +10,10 @@ public class CUIManager {
 
     private final Scanner scanner = new Scanner(System.in);
 
-    private final ArticleCUI articleCUI = new ArticleCUI(this);
-    private final StaffMemberAndCustomerCUI staffMemberAndCustomerCUI = new StaffMemberAndCustomerCUI(this);
+    private final DataPersister dataPersister = new DataPersister();
+
+    private final ArticleCUI articleCUI = new ArticleCUI(this, dataPersister);
+    private final StaffMemberAndCustomerCUI staffMemberAndCustomerCUI = new StaffMemberAndCustomerCUI(this, dataPersister);
 
     public void printLoginOption() {
         staffMemberAndCustomerCUI.loginOption();
@@ -24,7 +27,8 @@ public class CUIManager {
             System.out.println("0. Staff menu");
 
         System.out.println("1. Browse Articles");
-        System.out.println("2. Exit");
+        System.out.println("2. Check Shopping Basket");
+        System.out.println("3. Exit");
 
 
         if (scanner.hasNextInt()) {
@@ -38,6 +42,9 @@ public class CUIManager {
                     articleCUI.browseArticlesMenu();
                     break;
                 case 2:
+                    staffMemberAndCustomerCUI.printShoppingBasketManagementMenu();
+                    break;
+                case 3:
                     break;
                 default:
                     System.out.println("Invalid choice. Program terminated");
