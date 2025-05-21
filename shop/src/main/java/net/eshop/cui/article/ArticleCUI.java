@@ -3,8 +3,11 @@ package net.eshop.cui.article;
 import net.eshop.cui.CUIManager;
 import net.eshop.dataccess.DataPersister;
 import net.eshop.domain.Article;
+import net.eshop.domain.events.StockChange;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Random;
 import java.util.Scanner;
 
 public class ArticleCUI {
@@ -118,6 +121,11 @@ public class ArticleCUI {
 
         Article article = new Article(articleNumber, name, description, stock, price);
         dataPersister.createArticle(article);
+
+        Random random = new Random();
+        int id = random.nextInt(10000 - 1) + 1;
+        StockChange stockChange = new StockChange(id, LocalDateTime.now().getDayOfYear(), articleNumber, 0, article.getStock(), Integer.parseInt(System.getProperty("CURRENT_USER_ID")));
+        dataPersister.createStockChange(stockChange);
     }
 
     private void removeArticle() {
@@ -182,9 +190,15 @@ public class ArticleCUI {
         int stock = scanner.nextInt();
 
         Article article = dataPersister.readArticle(id);
+        int oldStock = article.getStock();
         article.setStock(stock);
 
         dataPersister.updateArticle(article);
+
+        Random random = new Random();
+        int stockChangeID = random.nextInt(10000 - 1) + 1;
+        StockChange stockChange = new StockChange(stockChangeID, LocalDateTime.now().getDayOfYear(), id, oldStock, article.getStock(), Integer.parseInt(System.getProperty("CURRENT_USER_ID")));
+        dataPersister.createStockChange(stockChange);
     }
 
     private void readArticle() {

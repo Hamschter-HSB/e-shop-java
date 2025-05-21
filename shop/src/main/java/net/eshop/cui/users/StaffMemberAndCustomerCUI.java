@@ -6,9 +6,12 @@ import net.eshop.domain.Article;
 import net.eshop.domain.Customer;
 import net.eshop.domain.ShoppingBasket;
 import net.eshop.domain.StaffMember;
+import net.eshop.domain.events.StockChange;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -62,6 +65,7 @@ public class StaffMemberAndCustomerCUI {
             System.out.println("You've successfully logged in!");
 
             System.setProperty("CURRENT_USER", "STAFF_MEMBER");
+            System.setProperty("CURRENT_USER_ID", String.valueOf(number));
 
             printStaffMenu();
         } else {
@@ -227,12 +231,19 @@ public class StaffMemberAndCustomerCUI {
 
     private void buyArticlesInShoppingCart() {
 
+        Random random = new Random();
+
         // Remove articles from stock
         dataPersister.getCustomer().getShoppingBasket().getArticleMap().forEach((id, amount) -> {
 
             Article article = dataPersister.readArticle(id);
-            article.setStock(article.getStock() - amount);
+            int oldStock = article.getStock();
+            article.setStock(oldStock - amount);
             dataPersister.updateArticle(article);
+
+            int stockChangeID = random.nextInt(10000 - 1) + 1;
+            StockChange stockChange = new StockChange(stockChangeID, LocalDateTime.now().getDayOfYear(), id, oldStock, article.getStock(), Integer.parseInt(System.getProperty("CURRENT_USER_ID")));
+            dataPersister.createStockChange(stockChange);
         });
 
         // Calculate total price
