@@ -126,6 +126,8 @@ public class ArticleCUI {
         int id = random.nextInt(10000 - 1) + 1;
         StockChange stockChange = new StockChange(id, LocalDateTime.now().getDayOfYear(), articleNumber, 0, article.getStock(), Integer.parseInt(System.getProperty("CURRENT_USER_ID")));
         dataPersister.createStockChange(stockChange);
+
+        printArticleManagementMenu();
     }
 
     private void removeArticle() {
@@ -209,6 +211,8 @@ public class ArticleCUI {
         int articleNumber = scanner.nextInt();
         Article read = dataPersister.readArticle(articleNumber);
         printArticle(read);
+
+        printArticleManagementMenu();
     }
 
     private void printArticle(Article article) {
