@@ -1,6 +1,6 @@
-package net.eshop.dataccess;
+package net.eshop.domain.dataaccess;
 
-import net.eshop.dataccess.database.ArticleDBManager;
+import net.eshop.domain.dataaccess.database.ArticleDBManager;
 import net.eshop.domain.Article;
 
 import java.io.IOException;

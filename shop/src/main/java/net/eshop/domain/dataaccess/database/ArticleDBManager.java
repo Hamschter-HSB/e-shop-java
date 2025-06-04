@@ -1,4 +1,4 @@
-package net.eshop.dataccess.database;
+package net.eshop.domain.dataaccess.database;
 
 import net.eshop.domain.Article;
 

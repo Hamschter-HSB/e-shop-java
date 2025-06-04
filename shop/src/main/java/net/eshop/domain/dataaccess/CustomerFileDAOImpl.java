@@ -1,40 +1,42 @@
-package net.eshop.dataccess;
+package net.eshop.domain.dataaccess;
 
-import net.eshop.domain.StaffMember;
+import net.eshop.domain.Customer;
+import net.eshop.domain.ShoppingBasket;
 import net.eshop.exceptions.UserNotFoundException;
 
 import java.io.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class StaffMembersFileDAOImpl implements DAO<StaffMember> {
+public class CustomerFileDAOImpl implements DAO<Customer> {
 
-    private static final Logger logger = Logger.getLogger(StaffMembersFileDAOImpl.class.getName());
+    private static final Logger logger = Logger.getLogger(CustomerFileDAOImpl.class.getName());
 
     public static final String DATA_PATH = "Data";
-    public static final String STAFF_MEMBERS = "StaffMembers";
+    public static final String CUSTOMERS = "Customers";
 
-    private final File file = new File(STAFF_MEMBERS);
+    private final File file = new File(CUSTOMERS);
 
-    public StaffMembersFileDAOImpl() {
+    public CustomerFileDAOImpl() {
 
         if (!file.exists()) {
             try {
                 file.createNewFile();
             } catch (IOException e) {
-                logger.log(Level.SEVERE, "Error creating file \"" + STAFF_MEMBERS + "\"", e);
+                logger.log(Level.SEVERE, "Error creating file \"" + CUSTOMERS + "\"", e);
             }
         }
     }
 
     @Override
-    public void create(StaffMember staffMember) throws IOException {
-        int id = staffMember.getNumber();
+    public void create(Customer customer) throws IOException {
+        int id = customer.getNumber();
 
-        if (containsStaffMember(id)) {
+        if (containsUser(id)) {
             logger.info(MessageFormat.format("StaffMember with number {0} does already exist!", id));
             return;
         }
@@ -43,15 +45,17 @@ public class StaffMembersFileDAOImpl implements DAO<StaffMember> {
              BufferedWriter bufferedReader = new BufferedWriter(fileWriter)) {
 
             bufferedReader.write(id + ".id=" + id + "\n");
-            bufferedReader.write(id + ".name=" + staffMember.getName() + "\n");
-            bufferedReader.write(id + ".password=" + staffMember.getPassword() + "\n");
+            bufferedReader.write(id + ".name=" + customer.getName() + "\n");
+            bufferedReader.write(id + ".password=" + customer.getPassword() + "\n");
+            bufferedReader.write(id + ".address=" + customer.getAddress() + "\n");
+            //TODO Add shopping basket using a OWN DAO
         }
     }
 
     @Override
-    public StaffMember read(int id) throws IOException {
+    public Customer read(int id) throws IOException {
 
-        if (!containsStaffMember(id))
+        if (!containsUser(id))
             throw new UserNotFoundException(MessageFormat.format("No user with number {0}", id));
 
         try (FileReader fileReader = new FileReader(file)) {
@@ -72,18 +76,19 @@ public class StaffMembersFileDAOImpl implements DAO<StaffMember> {
             int number = Integer.parseInt(duplicateArticles.get(0).replaceAll(regEx, ""));
             String userName = duplicateArticles.get(1).replaceAll(regEx, "");
             String password = duplicateArticles.get(2).replaceAll(regEx, "");
+            String address = duplicateArticles.get(3).replaceAll(regEx, "");
 
-            return new StaffMember(number, userName, password);
+            return new Customer(number, userName, password, address, new ShoppingBasket(new HashMap<>()));
         }
     }
 
     @Override
-    public List<StaffMember> readAll() throws IOException {
+    public List<Customer> readAll() throws IOException {
         return List.of();
     }
 
     @Override
-    public void update(StaffMember type) {
+    public void update(Customer type) {
 
     }
 
@@ -92,7 +97,7 @@ public class StaffMembersFileDAOImpl implements DAO<StaffMember> {
 
     }
 
-    private boolean containsStaffMember(int id) throws IOException {
+    private boolean containsUser(int id) throws IOException {
 
         try (FileReader fileReader = new FileReader(file)) {
 

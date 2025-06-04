@@ -1,7 +1,7 @@
 package net.eshop.cui.users;
 
 import net.eshop.cui.CUIManager;
-import net.eshop.dataccess.DataPersister;
+import net.eshop.domain.dataaccess.DataPersister;
 import net.eshop.domain.Article;
 import net.eshop.domain.Customer;
 import net.eshop.domain.ShoppingBasket;

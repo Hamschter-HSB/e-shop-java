@@ -1,4 +1,4 @@
-package net.eshop.dataccess.database;
+package net.eshop.domain.dataaccess.database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

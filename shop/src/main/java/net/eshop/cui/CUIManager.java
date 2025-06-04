@@ -2,7 +2,7 @@ package net.eshop.cui;
 
 import net.eshop.cui.article.ArticleCUI;
 import net.eshop.cui.users.StaffMemberAndCustomerCUI;
-import net.eshop.dataccess.DataPersister;
+import net.eshop.domain.dataaccess.DataPersister;
 
 import java.util.Scanner;
 

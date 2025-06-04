@@ -1,4 +1,4 @@
-package net.eshop.dataccess;
+package net.eshop.domain.dataaccess;
 
 import java.io.IOException;
 import java.util.List;

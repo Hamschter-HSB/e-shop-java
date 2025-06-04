@@ -1,4 +1,4 @@
-package net.eshop.dataccess;
+package net.eshop.domain.dataaccess;
 
 import net.eshop.domain.Article;
 import net.eshop.exceptions.ArticleNotFoundException;
