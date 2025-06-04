@@ -24,7 +24,7 @@ public class ArticleDBManager {
                 + "name TEXT NOT NULL,"
                 + "description TEXT NOT NULL,"
                 + "stock INTEGER NOT NULL," +
-                    "price DOUBLE NOT NULL,)";
+                    "price DOUBLE NOT NULL)";
 
             statement.execute(sql);
             statement.close();
