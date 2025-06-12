@@ -1,11 +1,8 @@
 package net.eshop.cui.users;
 
 import net.eshop.cui.CUIManager;
+import net.eshop.domain.*;
 import net.eshop.domain.dataaccess.DataPersister;
-import net.eshop.domain.Article;
-import net.eshop.domain.Customer;
-import net.eshop.domain.ShoppingBasket;
-import net.eshop.domain.StaffMember;
 import net.eshop.domain.events.StockChange;
 
 import java.time.LocalDate;
@@ -197,7 +194,7 @@ public class StaffMemberAndCustomerCUI {
         System.out.println("Enter the new amount of the article.");
         int newAmount = scanner.nextInt();
 
-        Article article = dataPersister.readArticle(articleNumber);
+        Article article = dataPersister.readBulkArticle(articleNumber);
 
         while (newAmount > article.getStock()) {
             System.out.println(article.getName() + " has " + article.getStock() + " items stored.");
@@ -221,7 +218,7 @@ public class StaffMemberAndCustomerCUI {
 
         shoppingBasketOfCurrentUser.getArticleMap().forEach((key, value) -> {
 
-            Article article = dataPersister.readArticle(key);
+            Article article = dataPersister.readBulkArticle(key);
             System.out.println("id: " + article.getArticleNumber());
             System.out.println("name: " + article.getName());
             System.out.println("description: " + article.getDescription());
@@ -236,13 +233,16 @@ public class StaffMemberAndCustomerCUI {
         // Remove articles from stock
         dataPersister.getCustomer().getShoppingBasket().getArticleMap().forEach((id, amount) -> {
 
-            Article article = dataPersister.readArticle(id);
-            int oldStock = article.getStock();
-            article.setStock(oldStock - amount);
-            dataPersister.updateArticle(article);
+            BulkArticle bulkArticle = dataPersister.readBulkArticle(id);
+            int oldStock = bulkArticle.getStock();
+
+            int newStock = oldStock - amount;
+
+            bulkArticle.setStock(newStock);
+            dataPersister.updateBulkArticle(bulkArticle);
 
             int stockChangeID = random.nextInt(10000 - 1) + 1;
-            StockChange stockChange = new StockChange(stockChangeID, LocalDateTime.now().getDayOfYear(), id, oldStock, article.getStock(), Integer.parseInt(System.getProperty("CURRENT_USER_ID")));
+            StockChange stockChange = new StockChange(stockChangeID, LocalDateTime.now().getDayOfYear(), id, oldStock, bulkArticle.getStock(), Integer.parseInt(System.getProperty("CURRENT_USER_ID")));
             dataPersister.createStockChange(stockChange);
         });
 
@@ -275,7 +275,7 @@ public class StaffMemberAndCustomerCUI {
 
         dataPersister.getCustomer().getShoppingBasket().getArticleMap().forEach((id, amount) -> {
 
-            Article article = dataPersister.readArticle(id);
+            Article article = dataPersister.readBulkArticle(id);
             totalPrice.updateAndGet(v -> v + article.getPrice() * amount);
 
             System.out.println("Article: " + article.getName());
