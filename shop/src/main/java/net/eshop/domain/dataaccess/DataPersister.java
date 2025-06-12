@@ -1,6 +1,7 @@
 package net.eshop.domain.dataaccess;
 
 import net.eshop.domain.Article;
+import net.eshop.domain.BulkArticle;
 import net.eshop.domain.Customer;
 import net.eshop.domain.StaffMember;
 import net.eshop.domain.events.StockChange;
@@ -10,7 +11,7 @@ import java.util.List;
 
 public class DataPersister {
 
-    private final DAO<Article> articleDAO = new ArticleFileDAOImpl();
+    private final DAO<BulkArticle> bulkArticleDAO = new BulkArticleFileDAOImpl();
     private final DAO<StaffMember> staffDAO = new StaffMembersFileDAOImpl();
     private final DAO<Customer> customerDAO = new CustomerFileDAOImpl();
     private final DAO<StockChange> stockChangeDAO = new StockChangeDAOImpl();
@@ -19,38 +20,64 @@ public class DataPersister {
     int currentUserId = 1;
     private final Customer customer = readCustomer(currentUserId);
 
-    public void createArticle(Article article) {
+    /* (Bulk)-Article */
+
+    public void createBulkArticle(BulkArticle bulkArticle) {
 
         try {
-            articleDAO.create(article);
+            bulkArticleDAO.create(bulkArticle);
         } catch (IOException ioException) {
             ioException.printStackTrace();
         }
     }
 
-    public Article readArticle(int id) {
+//    public void createArticle(Article article) {
+//        try {
+//            bulkArticleDAO.create((BulkArticle) article);
+//        } catch (IOException ioException) {
+//            ioException.printStackTrace();
+//        }
+//    }
+
+    public BulkArticle readBulkArticle(int id) {
         try {
-            return articleDAO.read(id);
+            return bulkArticleDAO.read(id);
         } catch (IOException ioException) {
             throw new RuntimeException(ioException.getMessage());
         }
     }
 
-    public List<Article> readAllArticles() {
+//    public Article readArticle(int id) {
+//        try {
+//            return bulkArticleDAO.read(id);
+//        } catch (IOException ioException) {
+//            throw new RuntimeException(ioException.getMessage());
+//        }
+//    }
+
+    public List<BulkArticle> readAllBulkArticles() {
         try {
-            return articleDAO.readAll();
+            return bulkArticleDAO.readAll();
         } catch (IOException ioException) {
             throw new RuntimeException(ioException.getMessage());
         }
     }
 
-    public void updateArticle(Article article) {
+    public void updateBulkArticle(BulkArticle bulkArticle) {
         try {
-            articleDAO.update(article);
+            bulkArticleDAO.update(bulkArticle);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
+
+//    public void updateArticle(Article article) {
+//        try {
+//            bulkArticleDAO.update((BulkArticle) article);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 
     /* StaffMember */
 
