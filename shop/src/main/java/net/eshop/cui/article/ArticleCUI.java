@@ -1,10 +1,13 @@
 package net.eshop.cui.article;
 
 import net.eshop.cui.CUIManager;
+import net.eshop.domain.BulkArticle;
 import net.eshop.domain.dataaccess.DataPersister;
 import net.eshop.domain.Article;
 import net.eshop.domain.events.StockChange;
+import net.eshop.exceptions.NoMultipleOfBulkEcxeption;
 
+import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
@@ -53,8 +56,8 @@ public class ArticleCUI {
 
         System.out.println("-----E-Shop/Article/Management/Manage articles-----");
 
-        List<Article> articles = dataPersister.readAllArticles();
-        articles.forEach(article -> {
+        List<BulkArticle> bulkArticles = dataPersister.readAllBulkArticles();
+        bulkArticles.forEach(article -> {
             printArticle(article);
             System.out.println();
         });
@@ -111,7 +114,7 @@ public class ArticleCUI {
     private void addArticle() {
 
         System.out.println("-----E-Shop/Article/Management/Add article-----");
-        System.out.println("Write: [\"articleNumber\" \"name\" \"description\" \"stock\" \"price\"] to add an article.");
+        System.out.println("Write: [\"articleNumber\" \"name\" \"description\" \"stock\" \"price\" \"bulk size\"] to add an article.");
 
         int articleNumber = scanner.nextInt();
         String name = scanner.next();
@@ -119,12 +122,22 @@ public class ArticleCUI {
         int stock = scanner.nextInt();
         double price = scanner.nextDouble();
 
-        Article article = new Article(articleNumber, name, description, stock, price);
-        dataPersister.createArticle(article);
+        int bulkSize = scanner.nextInt();
+
+        if(bulkSize > 0) {
+            while (stock % bulkSize != 0) {
+                System.out.println(name + " has a stock of " + stock + ". This is not a multiple of " + bulkSize);
+                System.out.println("Enter the new stock of the bulk article.");
+                stock = scanner.nextInt();
+            }
+        }
+
+        BulkArticle bulkArticle = new BulkArticle(articleNumber, name, description, stock, price, bulkSize);
+        dataPersister.createBulkArticle(bulkArticle);
 
         Random random = new Random();
         int id = random.nextInt(10000 - 1) + 1;
-        StockChange stockChange = new StockChange(id, LocalDateTime.now().getDayOfYear(), articleNumber, 0, article.getStock(), Integer.parseInt(System.getProperty("CURRENT_USER_ID")));
+        StockChange stockChange = new StockChange(id, LocalDateTime.now().getDayOfYear(), articleNumber, 0, bulkArticle.getStock(), Integer.parseInt(System.getProperty("CURRENT_USER_ID")));
         dataPersister.createStockChange(stockChange);
 
         printArticleManagementMenu();
@@ -191,15 +204,24 @@ public class ArticleCUI {
         System.out.println("Write the new stock amount.");
         int stock = scanner.nextInt();
 
-        Article article = dataPersister.readArticle(id);
-        int oldStock = article.getStock();
-        article.setStock(stock);
+        BulkArticle bulkArticle = dataPersister.readBulkArticle(id);
+        int oldStock = bulkArticle.getStock();
 
-        dataPersister.updateArticle(article);
+        boolean isMultiple = true;
+
+        if(bulkArticle.getBulkSize() > 0)
+            isMultiple = stock % bulkArticle.getBulkSize() == 0;
+
+        if(isMultiple)
+            bulkArticle.setStock(stock);
+        else
+            throw new NoMultipleOfBulkEcxeption(MessageFormat.format("Error: Article amount must be a multiple of {0}", bulkArticle));
+
+        dataPersister.updateBulkArticle(bulkArticle);
 
         Random random = new Random();
         int stockChangeID = random.nextInt(10000 - 1) + 1;
-        StockChange stockChange = new StockChange(stockChangeID, LocalDateTime.now().getDayOfYear(), id, oldStock, article.getStock(), Integer.parseInt(System.getProperty("CURRENT_USER_ID")));
+        StockChange stockChange = new StockChange(stockChangeID, LocalDateTime.now().getDayOfYear(), id, oldStock, bulkArticle.getStock(), Integer.parseInt(System.getProperty("CURRENT_USER_ID")));
         dataPersister.createStockChange(stockChange);
     }
 
@@ -209,7 +231,7 @@ public class ArticleCUI {
         System.out.println("Write: [\"articleNumber\"] to find the article.");
 
         int articleNumber = scanner.nextInt();
-        Article read = dataPersister.readArticle(articleNumber);
+        BulkArticle read = dataPersister.readBulkArticle(articleNumber);
         printArticle(read);
 
         printArticleManagementMenu();
@@ -220,6 +242,9 @@ public class ArticleCUI {
         System.out.println("name: " + article.getName());
         System.out.println("description: " + article.getDescription());
         System.out.println("stock: " + article.getStock());
+
+        if(article instanceof BulkArticle bulkArticle && bulkArticle.getBulkSize() > 0)
+            System.out.println("bulk size: " + bulkArticle.getBulkSize());
     }
 
     private void addArticleToShoppingBasket() {
@@ -230,14 +255,22 @@ public class ArticleCUI {
         System.out.println("Please choose how many Items of this number you wish to add to your Basket.");
         int articleAmount = scanner.nextInt();
 
-        Article article = dataPersister.readArticle(articleNumber);
+        BulkArticle bulkArticle = dataPersister.readBulkArticle(articleNumber);
 
-        while (articleAmount > article.getStock()) {
-            System.out.println(article.getName() + " has " + article.getStock() + " items stored.");
+        while (articleAmount > bulkArticle.getStock()) {
+            System.out.println(bulkArticle.getName() + " has " + bulkArticle.getStock() + " items stored.");
             System.out.println("Enter the amount of the article.");
             articleAmount = scanner.nextInt();
         }
 
-        dataPersister.getCustomer().getShoppingBasket().addToArticleMap(article.getArticleNumber(), articleAmount);
+        boolean isMultiple = true;
+
+        if(bulkArticle.getBulkSize() > 0)
+            isMultiple = articleAmount % bulkArticle.getBulkSize() == 0;
+
+        if(isMultiple)
+            dataPersister.getCustomer().getShoppingBasket().addToArticleMap(bulkArticle.getArticleNumber(), articleAmount);
+        else
+            throw new NoMultipleOfBulkEcxeption(MessageFormat.format("Error: Article amount must be a multiple of {0}", bulkArticle));
     }
 }
