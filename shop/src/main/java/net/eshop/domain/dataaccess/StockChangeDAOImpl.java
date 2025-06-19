@@ -1,11 +1,16 @@
 package net.eshop.domain.dataaccess;
 
+import net.eshop.domain.BulkArticle;
 import net.eshop.domain.events.StockChange;
+import net.eshop.exceptions.ArticleNotFoundException;
 
 import java.io.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -55,12 +60,59 @@ public class StockChangeDAOImpl implements DAO<StockChange> {
 
     @Override
     public StockChange read(int id) throws IOException {
-        return null;
+
+        if (!containsStockChange(id))
+            throw new ArticleNotFoundException(MessageFormat.format("No stock change with id {0}", id));
+
+        try (FileReader fileReader = new FileReader(file)) {
+
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            List<String> duplicateStockChange = new ArrayList<>();
+
+            bufferedReader.lines().forEach(line -> {
+
+                if (line.startsWith(id + "."))
+                    duplicateStockChange.add(line);
+            });
+
+            final String regEx = ".*=";
+
+            int identifier = Integer.parseInt(duplicateStockChange.get(0).replaceAll(regEx, ""));
+            int dayOfYear = Integer.parseInt(duplicateStockChange.get(1).replaceAll(regEx, ""));
+            int articleNumber = Integer.parseInt(duplicateStockChange.get(2).replaceAll(regEx, ""));
+            int oldAmount = Integer.parseInt(duplicateStockChange.get(3).replaceAll(regEx, ""));
+            int newAmount = Integer.parseInt(duplicateStockChange.get(4).replaceAll(regEx, ""));
+            int userID = Integer.parseInt(duplicateStockChange.get(5).replaceAll(regEx, ""));
+
+            return new StockChange(identifier, dayOfYear, articleNumber, oldAmount, newAmount, userID);
+        }
     }
 
     @Override
     public List<StockChange> readAll() throws IOException {
+
         List<StockChange> stockChanges = new ArrayList<>();
+        Set<Integer> stockChangeIDS = new HashSet<>();
+
+        try (FileReader fileReader = new FileReader(file)) {
+
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            AtomicInteger counter = new AtomicInteger();
+
+            bufferedReader.lines().forEach(line -> {
+                if (counter.getAndIncrement() % 6 == 0) {
+                    stockChangeIDS.add(Integer.parseInt(line.replaceAll(REG_EX, "")));
+                }
+            });
+
+            stockChangeIDS.forEach(stockChangeID -> {
+                try {
+                    stockChanges.add(read(stockChangeID));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
         return stockChanges;
     }
 
@@ -77,16 +129,15 @@ public class StockChangeDAOImpl implements DAO<StockChange> {
         try (FileReader fileReader = new FileReader(file)) {
 
             BufferedReader bufferedReader = new BufferedReader(fileReader);
-            List<String> duplicateArticles = new ArrayList<>();
+            List<String> duplicateStockChanges = new ArrayList<>();
 
             bufferedReader.lines().forEach(line -> {
 
                 if (line.startsWith(id + "."))
-                    duplicateArticles.add(line);
+                    duplicateStockChanges.add(line);
             });
 
-            //if the list is not empty. a article is a duplicate
-            return !duplicateArticles.isEmpty();
+            return !duplicateStockChanges.isEmpty();
         }
     }
 }
