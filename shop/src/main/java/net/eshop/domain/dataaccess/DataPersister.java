@@ -1,13 +1,15 @@
 package net.eshop.domain.dataaccess;
 
-import net.eshop.domain.Article;
 import net.eshop.domain.BulkArticle;
 import net.eshop.domain.Customer;
 import net.eshop.domain.StaffMember;
 import net.eshop.domain.events.StockChange;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class DataPersister {
 
@@ -118,6 +120,33 @@ public class DataPersister {
             stockChangeDAO.create(stockChange);
         } catch (IOException ioException) {
             throw new RuntimeException(ioException.getMessage());
+        }
+    }
+
+    public List<StockChange> listPastStockChanges(int days, int articleID) {
+
+        if(days > 30)
+            return Collections.emptyList();
+
+        BulkArticle bulkArticle = readBulkArticle(articleID);
+
+        if(bulkArticle == null)
+            return Collections.emptyList();
+
+        List<StockChange> stockChange = readAllStockChanges();
+
+        return stockChange.stream()
+                .filter(sc -> sc.getDayOfYear() == (LocalDateTime.now().getDayOfYear() - days))
+                .filter(sc -> sc.getArticleNumber() == articleID)
+                .collect(Collectors.toList());
+    }
+
+    public List<StockChange> readAllStockChanges() {
+
+        try {
+            return stockChangeDAO.readAll();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
