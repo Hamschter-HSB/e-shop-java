@@ -242,7 +242,7 @@ public class StaffMemberAndCustomerCUI {
             dataPersister.updateBulkArticle(bulkArticle);
 
             int stockChangeID = random.nextInt(10000 - 1) + 1;
-            StockChange stockChange = new StockChange(stockChangeID, LocalDateTime.now().getDayOfYear(), id, oldStock, bulkArticle.getStock(), Integer.parseInt(System.getProperty("CURRENT_USER_ID")));
+            StockChange stockChange = new StockChange(stockChangeID, LocalDateTime.now().getDayOfYear(), oldStock, id, bulkArticle.getStock(), Integer.parseInt(System.getProperty("CURRENT_USER_ID")));
             dataPersister.createStockChange(stockChange);
         });
 
