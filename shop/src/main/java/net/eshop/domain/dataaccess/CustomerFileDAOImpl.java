@@ -1,20 +1,23 @@
 package net.eshop.domain.dataaccess;
 
+import net.eshop.domain.BulkArticle;
 import net.eshop.domain.Customer;
 import net.eshop.domain.ShoppingBasket;
+import net.eshop.domain.User;
 import net.eshop.exceptions.UserNotFoundException;
 
 import java.io.*;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class CustomerFileDAOImpl implements DAO<Customer> {
 
     private static final Logger logger = Logger.getLogger(CustomerFileDAOImpl.class.getName());
+
+    private final String REG_EX = ".*=";
 
     public static final String DATA_PATH = "Data";
     public static final String CUSTOMERS = "Customers";
@@ -84,7 +87,30 @@ public class CustomerFileDAOImpl implements DAO<Customer> {
 
     @Override
     public List<Customer> readAll() throws IOException {
-        return List.of();
+
+        List<Customer> allCustomers = new ArrayList<>();
+        Set<Integer> allCustomerIds = new HashSet<>();
+
+        try (FileReader fileReader = new FileReader(file)) {
+
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            AtomicInteger counter = new AtomicInteger();
+
+            bufferedReader.lines().forEach(line -> {
+                if (counter.getAndIncrement() % 4 == 0) {
+                    allCustomerIds.add(Integer.parseInt(line.replaceAll(REG_EX, "")));
+                }
+            });
+
+            allCustomerIds.forEach(userID -> {
+                try {
+                    allCustomers.add(read(userID));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
+        return allCustomers;
     }
 
     @Override

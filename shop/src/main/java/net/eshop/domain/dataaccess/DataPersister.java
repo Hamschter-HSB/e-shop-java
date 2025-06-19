@@ -3,15 +3,20 @@ package net.eshop.domain.dataaccess;
 import net.eshop.domain.BulkArticle;
 import net.eshop.domain.Customer;
 import net.eshop.domain.StaffMember;
+import net.eshop.domain.User;
 import net.eshop.domain.events.StockChange;
+import net.eshop.ui.LoginUI;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class DataPersister {
+
+    private static final Logger logger = Logger.getLogger(DataPersister.class.getName());
 
     private final DAO<BulkArticle> bulkArticleDAO = new BulkArticleFileDAOImpl();
     private final DAO<StaffMember> staffDAO = new StaffMembersFileDAOImpl();
@@ -153,5 +158,32 @@ public class DataPersister {
     // TODO REMOVE and use own DAO. Temporary code
     public Customer getCustomer() {
         return customer;
+    }
+
+    public List<Customer> readAllCustomers() {
+        try {
+            return customerDAO.readAll();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Customer loginCustomer(String userName, String password) {
+
+        List<Customer> allCustomers = readAllCustomers();
+
+        Customer customerTryingToLogin = allCustomers.stream()
+                .filter(c -> c.getName().equals(userName))
+                .anyMatch(c -> c.getPassword().equals(password)) ? getCustomer() : null;
+
+        //TODO continue implementation (Just debug here)
+        if (customerTryingToLogin != null) {
+            logger.info("Login successfully for " + customerTryingToLogin.getName());
+            return customer;
+        } else {
+            logger.info("Login failed for customer.");
+            return null;
+        }
+
     }
 }
