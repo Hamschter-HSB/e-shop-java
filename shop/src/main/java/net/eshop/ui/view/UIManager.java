@@ -1,4 +1,4 @@
-package net.eshop.ui;
+package net.eshop.ui.view;
 
 import net.eshop.domain.dataaccess.DataPersister;
 
@@ -12,19 +12,21 @@ public class UIManager {
 
     private final JFrame mainFrame = new JFrame("E-Shop");
 
-    private final LoginUI loginUI;
+    private final LoginView loginView;
+    private final ShopUI shopUI;
 
     public UIManager() {
 
         DataPersister dataPersister = new DataPersister();
-        loginUI = new LoginUI(dataPersister);
+        loginView = new LoginView(dataPersister);
+        shopUI = new ShopUI(dataPersister);
     }
 
     public void start() {
 
         setup();
 
-        mainFrame.add(loginUI.loginAndRegister());
+        mainFrame.add(loginView.loginAndRegister());
         mainFrame.setVisible(true);
     }
 

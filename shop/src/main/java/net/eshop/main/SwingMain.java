@@ -1,6 +1,6 @@
 package net.eshop.main;
 
-import net.eshop.ui.UIManager;
+import net.eshop.ui.view.UIManager;
 
 public class SwingMain {
 
