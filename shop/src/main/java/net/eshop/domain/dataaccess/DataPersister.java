@@ -3,10 +3,13 @@ package net.eshop.domain.dataaccess;
 import net.eshop.domain.BulkArticle;
 import net.eshop.domain.Customer;
 import net.eshop.domain.StaffMember;
+import net.eshop.domain.User;
 import net.eshop.domain.events.StockChange;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -15,7 +18,7 @@ import java.util.stream.Collectors;
 
 public class DataPersister {
 
-    private static final Logger logger = Logger.getLogger(DataPersister.class.getName());
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(DataPersister.class);
 
     private final DAO<BulkArticle> bulkArticleDAO = new BulkArticleFileDAOImpl();
     private final DAO<StaffMember> staffDAO = new StaffMembersFileDAOImpl();
@@ -167,20 +170,39 @@ public class DataPersister {
         }
     }
 
-    public Customer findCustomerByCredentials(String userName, String password) {
+    public List<StaffMember> readAllStaffMembers() {
+        try {
+            return staffDAO.readAll();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-        List<Customer> allCustomers = readAllCustomers();
+    public <T extends User> T findUserByCredentials(String userName, String password, Class<T> clazz) {
 
-        Customer customerTryingToLogin = null;
+        List<T> allUsers = new ArrayList<>();
+
+        if(!(clazz.equals(Customer.class) || clazz.equals(StaffMember.class))) {
+            throw new IllegalArgumentException("Unknown class " + clazz.getName() + ". Not a sub type of class " + User.class.getName());
+        }
+
+        if(clazz.equals(Customer.class)) {
+            allUsers = (List<T>) readAllCustomers();
+        }
+
+        if(clazz.equals(StaffMember.class)) {
+            allUsers = (List<T>) readAllStaffMembers();
+        }
+
+        T userTryingToLogin = null;
 
         try {
-            customerTryingToLogin = allCustomers.stream()
-                    .filter(c -> c.getName().equals(userName) && c.getPassword().equals(password))
+            userTryingToLogin = allUsers.stream()
+                    .filter(u -> u.getName().equals(userName) && u.getPassword().equals(password))
                     .toList().getFirst();
         } catch (NoSuchElementException ignored) {
         }
 
-        return customerTryingToLogin;
-
+        return userTryingToLogin;
     }
 }

@@ -41,7 +41,7 @@ public class LoginUI {
             for (char c : passwordField.getPassword())
                 stringBuilder.append(c);
 
-            Customer customer = dataPersister.findCustomerByCredentials(userNameTextField.getText(), stringBuilder.toString());
+            Customer customer = dataPersister.findUserByCredentials(userNameTextField.getText(), stringBuilder.toString(), Customer.class);
 
             if (customer == null) {
 
@@ -59,7 +59,7 @@ public class LoginUI {
             System.setProperty("CURRENT_USER", "CUSTOMER");
             System.setProperty("CURRENT_USER_ID", String.valueOf(customer.getNumber()));
 
-            logger.info("Login successfully for " + userNameTextField.getText());
+            logger.info("Login successfully for customer " + userNameTextField.getText());
         });
 
         loginButton.setPreferredSize(buttonDimension);
