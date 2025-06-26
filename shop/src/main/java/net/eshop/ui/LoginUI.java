@@ -5,6 +5,8 @@ import net.eshop.domain.dataaccess.DataPersister;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.logging.Logger;
 
 public class LoginUI {
@@ -36,16 +38,13 @@ public class LoginUI {
         // Login for customer
         loginButton.addActionListener(actionEvent -> {
 
-            StringBuilder stringBuilder = new StringBuilder();
+            String password = getPasswordStringFromPasswordField(passwordField);
 
-            for (char c : passwordField.getPassword())
-                stringBuilder.append(c);
-
-            Customer customer = dataPersister.findUserByCredentials(userNameTextField.getText(), stringBuilder.toString(), Customer.class);
+            Customer customer = dataPersister.findUserByCredentials(userNameTextField.getText(), password, Customer.class);
 
             if (customer == null) {
 
-                logger.info("Login failed for customer.");
+                logger.info("Login failed for customer " + userNameTextField.getText());
 
                 JOptionPane.showMessageDialog(loginAndRegisterMainPanel,
                         "Username or password is incorrect.",
@@ -83,6 +82,36 @@ public class LoginUI {
         employeeLogin.setAlignmentX(Component.RIGHT_ALIGNMENT);
         loginAndRegisterChildPanel.add(employeeLogin);
 
+        //login for staff member
+        employeeLogin.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+
+                String password = getPasswordStringFromPasswordField(passwordField);
+
+                StaffMember staffMember = dataPersister.findUserByCredentials(userNameTextField.getText(), password, StaffMember.class);
+
+                if (staffMember == null) {
+
+                    logger.info("Login failed for staff member " + userNameTextField.getText());
+
+                    JOptionPane.showMessageDialog(loginAndRegisterMainPanel,
+                            "Username or password is incorrect.",
+                            "Wrong credentials",
+                            JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
+                loginAndRegisterMainPanel.setVisible(false);
+
+                System.setProperty("CURRENT_USER", "STAFF_MEMBER");
+                System.setProperty("CURRENT_USER_ID", String.valueOf(staffMember.getNumber()));
+
+                logger.info("Login successfully for staff member " + userNameTextField.getText());
+            }
+        });
+
         registerButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         loginButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         employeeLogin.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -90,5 +119,15 @@ public class LoginUI {
         loginAndRegisterMainPanel.add(loginAndRegisterChildPanel);
 
         return loginAndRegisterMainPanel;
+    }
+
+    private static String getPasswordStringFromPasswordField(JPasswordField passwordField) {
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (char c : passwordField.getPassword())
+            stringBuilder.append(c);
+
+        return stringBuilder.toString();
     }
 }

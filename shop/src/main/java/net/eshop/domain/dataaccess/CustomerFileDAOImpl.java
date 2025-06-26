@@ -74,12 +74,10 @@ public class CustomerFileDAOImpl implements DAO<Customer> {
 
             assert duplicateArticles.size() == 4;
 
-            final String regEx = ".*=";
-
-            int number = Integer.parseInt(duplicateArticles.get(0).replaceAll(regEx, ""));
-            String userName = duplicateArticles.get(1).replaceAll(regEx, "");
-            String password = duplicateArticles.get(2).replaceAll(regEx, "");
-            String address = duplicateArticles.get(3).replaceAll(regEx, "");
+            int number = Integer.parseInt(duplicateArticles.get(0).replaceAll(REG_EX, ""));
+            String userName = duplicateArticles.get(1).replaceAll(REG_EX, "");
+            String password = duplicateArticles.get(2).replaceAll(REG_EX, "");
+            String address = duplicateArticles.get(3).replaceAll(REG_EX, "");
 
             return new Customer(number, userName, password, address, new ShoppingBasket(new HashMap<>()));
         }
