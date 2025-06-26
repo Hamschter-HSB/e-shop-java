@@ -3,14 +3,13 @@ package net.eshop.domain.dataaccess;
 import net.eshop.domain.BulkArticle;
 import net.eshop.domain.Customer;
 import net.eshop.domain.StaffMember;
-import net.eshop.domain.User;
 import net.eshop.domain.events.StockChange;
-import net.eshop.ui.LoginUI;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -130,12 +129,12 @@ public class DataPersister {
 
     public List<StockChange> listPastStockChanges(int days, int articleID) {
 
-        if(days > 30)
+        if (days > 30)
             return Collections.emptyList();
 
         BulkArticle bulkArticle = readBulkArticle(articleID);
 
-        if(bulkArticle == null)
+        if (bulkArticle == null)
             return Collections.emptyList();
 
         List<StockChange> stockChange = readAllStockChanges();
@@ -168,22 +167,20 @@ public class DataPersister {
         }
     }
 
-    public Customer loginCustomer(String userName, String password) {
+    public Customer findCustomerByCredentials(String userName, String password) {
 
         List<Customer> allCustomers = readAllCustomers();
 
-        Customer customerTryingToLogin = allCustomers.stream()
-                .filter(c -> c.getName().equals(userName))
-                .anyMatch(c -> c.getPassword().equals(password)) ? getCustomer() : null;
+        Customer customerTryingToLogin = null;
 
-        //TODO continue implementation (Just debug here)
-        if (customerTryingToLogin != null) {
-            logger.info("Login successfully for " + customerTryingToLogin.getName());
-            return customer;
-        } else {
-            logger.info("Login failed for customer.");
-            return null;
+        try {
+            customerTryingToLogin = allCustomers.stream()
+                    .filter(c -> c.getName().equals(userName) && c.getPassword().equals(password))
+                    .toList().getFirst();
+        } catch (NoSuchElementException ignored) {
         }
+
+        return customerTryingToLogin;
 
     }
 }
