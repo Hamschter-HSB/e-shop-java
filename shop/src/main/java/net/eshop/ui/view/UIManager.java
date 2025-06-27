@@ -1,6 +1,7 @@
 package net.eshop.ui.view;
 
 import net.eshop.domain.dataaccess.DataPersister;
+import net.eshop.ui.viewmodel.LoginAndRegistrationViewModel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,13 +13,17 @@ public class UIManager {
 
     private final JFrame mainFrame = new JFrame("E-Shop");
 
-    private final LoginView loginView;
+    private final LoginAndRegistrationView loginAndRegistrationView;
     private final ShopUI shopUI;
+
 
     public UIManager() {
 
         DataPersister dataPersister = new DataPersister();
-        loginView = new LoginView(dataPersister);
+
+        LoginAndRegistrationViewModel loginAndRegistrationViewModel = new LoginAndRegistrationViewModel(dataPersister);
+        loginAndRegistrationView = new LoginAndRegistrationView(loginAndRegistrationViewModel);
+
         shopUI = new ShopUI(dataPersister);
     }
 
@@ -26,7 +31,7 @@ public class UIManager {
 
         setup();
 
-        mainFrame.add(loginView.loginAndRegister());
+        mainFrame.add(loginAndRegistrationView.login());
         mainFrame.setVisible(true);
     }
 
