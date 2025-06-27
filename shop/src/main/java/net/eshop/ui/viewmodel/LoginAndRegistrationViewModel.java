@@ -4,6 +4,7 @@ import net.eshop.domain.Customer;
 import net.eshop.domain.ShoppingBasket;
 import net.eshop.domain.StaffMember;
 import net.eshop.domain.dataaccess.DataPersister;
+import net.eshop.ui.events.LoginListener;
 
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
@@ -18,6 +19,7 @@ public class LoginAndRegistrationViewModel {
     private static final Logger logger = Logger.getLogger(LoginAndRegistrationViewModel.class.getName());
 
     private final DataPersister dataPersister;
+    private LoginListener loginListener;
 
     public LoginAndRegistrationViewModel(DataPersister dataPersister) {
         this.dataPersister = dataPersister;
@@ -92,6 +94,9 @@ public class LoginAndRegistrationViewModel {
         System.setProperty("CURRENT_USER", "CUSTOMER");
         System.setProperty("CURRENT_USER_ID", String.valueOf(customer.getNumber()));
 
+        if (loginListener != null)
+            loginListener.onLoginSuccess();
+
         logger.info("Login successfully for customer " + userName);
     }
 
@@ -101,6 +106,7 @@ public class LoginAndRegistrationViewModel {
             @Override
             public void mouseClicked(MouseEvent e) {
 
+                //TODO weiter
                 if (userName.isBlank() || charPassword.length == 0) {
                     oneOrMoreFieldsEmptyDialog(userName, loginMainPanel);
                     return;
@@ -126,6 +132,9 @@ public class LoginAndRegistrationViewModel {
                 System.setProperty("CURRENT_USER", "STAFF_MEMBER");
                 System.setProperty("CURRENT_USER_ID", String.valueOf(staffMember.getNumber()));
 
+                if (loginListener != null)
+                    loginListener.onLoginSuccess();
+
                 logger.info("Login successfully for staff member " + userName);
             }
         });
@@ -149,5 +158,9 @@ public class LoginAndRegistrationViewModel {
             stringBuilder.append(c);
 
         return stringBuilder.toString();
+    }
+
+    public void setLoggedIn(LoginListener loginListener) {
+        this.loginListener = loginListener;
     }
 }
