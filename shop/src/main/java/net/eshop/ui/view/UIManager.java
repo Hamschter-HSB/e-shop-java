@@ -14,7 +14,6 @@ public class UIManager {
 
     private final JFrame mainFrame = new JFrame("E-Shop");
     private final MenuBar menuBar = new MenuBar();
-    private final Menu fileMenu = new Menu("File");
     private final Menu staffMember = new Menu("StaffMember");
     private final MenuItem menuItem = new MenuItem("Close");
     private final MenuItem registerStaffMember = new MenuItem("Register staff member");
@@ -54,6 +53,7 @@ public class UIManager {
 
         shopMainViewModel.setRegisteredStaffMember(() -> mainFrame.add(shopMainVJPanel));
 
+        // Back from staff member registration ui
         shopMainView.setUiBackListener(() -> mainFrame.add(shopMainVJPanel));
 
         registerStaffMember.addActionListener(actionEvent -> {
@@ -70,9 +70,7 @@ public class UIManager {
 
         mainFrame.setLayout(new BorderLayout());
 
-        fileMenu.add(menuItem);
         staffMember.add(registerStaffMember);
-        menuBar.add(fileMenu);
 
         mainFrame.setMenuBar(menuBar);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
