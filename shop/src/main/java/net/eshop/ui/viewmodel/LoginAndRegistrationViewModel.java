@@ -4,6 +4,7 @@ import net.eshop.domain.Customer;
 import net.eshop.domain.ShoppingBasket;
 import net.eshop.domain.StaffMember;
 import net.eshop.domain.dataaccess.DataPersister;
+import net.eshop.ui.DialogUtils;
 import net.eshop.ui.events.LoginListener;
 
 import javax.swing.*;
@@ -28,11 +29,14 @@ public class LoginAndRegistrationViewModel {
     public void registerButtonClickHandler(String userName, char[] charPassword, String address, JPanel registrationMainPanel) {
 
         if (userName.isBlank() || charPassword.length == 0 || address.isBlank()) {
-            oneOrMoreFieldsEmptyDialog(userName, registrationMainPanel);
+
+            DialogUtils.emptyInputFields(registrationMainPanel);
+            logger.info("Registration failed for customer " + userName + ". Empty input field(s)");
+
             return;
         }
 
-        String password = getPasswordStringFromPasswordField(charPassword);
+        String password = new String(charPassword);
 
         Customer customer = dataPersister.findUserByCredentials(userName, password, Customer.class);
 
@@ -69,11 +73,14 @@ public class LoginAndRegistrationViewModel {
     public void customerLoginButtonClickHandler(String userName, char[] charPassword, JPanel loginMainPanel) {
 
         if (userName.isBlank() || charPassword.length == 0) {
-            oneOrMoreFieldsEmptyDialog(userName, loginMainPanel);
+
+            DialogUtils.emptyInputFields(loginMainPanel);
+            logger.info("Login failed for customer " + userName + ". Empty input field(s)");
+
             return;
         }
 
-        String password = getPasswordStringFromPasswordField(charPassword);
+        String password = new String(charPassword);
 
         Customer customer = dataPersister.findUserByCredentials(userName, password, Customer.class);
 
@@ -100,19 +107,22 @@ public class LoginAndRegistrationViewModel {
         logger.info("Login successfully for customer " + userName);
     }
 
-    public void staffMemberLoginButtonClickHandler(String userName, char[] charPassword, JPanel loginMainPanel, JLabel employeeLogin) {
+    public void staffMemberLoginButtonClickHandler(JTextField userNameField, JPasswordField passwordField, JPanel loginMainPanel, JLabel employeeLogin) {
         employeeLogin.addMouseListener(new MouseAdapter() {
 
             @Override
             public void mouseClicked(MouseEvent e) {
 
-                //TODO weiter
-                if (userName.isBlank() || charPassword.length == 0) {
-                    oneOrMoreFieldsEmptyDialog(userName, loginMainPanel);
+                String userName = userNameField.getText();
+                String password = new String(passwordField.getPassword());
+
+                if (userName.isBlank() || password.isBlank()) {
+
+                    DialogUtils.emptyInputFields(loginMainPanel);
+                    logger.info("Login failed for customer " + userName + ". Empty input field(s)");
+
                     return;
                 }
-
-                String password = getPasswordStringFromPasswordField(charPassword);
 
                 StaffMember staffMember = dataPersister.findUserByCredentials(userName, password, StaffMember.class);
 
@@ -138,26 +148,6 @@ public class LoginAndRegistrationViewModel {
                 logger.info("Login successfully for staff member " + userName);
             }
         });
-    }
-
-    private static void oneOrMoreFieldsEmptyDialog(String userName, JPanel registrationMainPanel) {
-
-        logger.info("Login failed for customer " + userName + ". Empty input field(s)");
-
-        JOptionPane.showMessageDialog(registrationMainPanel,
-                "One or more fields are empty.",
-                "Empty input field(s).",
-                JOptionPane.WARNING_MESSAGE);
-    }
-
-    private static String getPasswordStringFromPasswordField(char[] password) {
-
-        StringBuilder stringBuilder = new StringBuilder();
-
-        for (char c : password)
-            stringBuilder.append(c);
-
-        return stringBuilder.toString();
     }
 
     public void setLoggedIn(LoginListener loginListener) {

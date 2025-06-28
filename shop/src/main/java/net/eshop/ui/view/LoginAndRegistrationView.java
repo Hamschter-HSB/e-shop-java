@@ -62,7 +62,7 @@ public class LoginAndRegistrationView {
         loginChildPanel.add(employeeLogin);
 
         // Login for staff member
-        loginAndRegistrationViewModel.staffMemberLoginButtonClickHandler(userNameTextField.getText(), passwordField.getPassword(), loginMainPanel, employeeLogin);
+        loginAndRegistrationViewModel.staffMemberLoginButtonClickHandler(userNameTextField, passwordField, loginMainPanel, employeeLogin);
 
         customerRegisterButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         customerLoginButton.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -90,7 +90,7 @@ public class LoginAndRegistrationView {
         JButton registerButton = new JButton("Register");
         Dimension buttonDimension = new Dimension(200, 35);
 
-        // Login for customer
+        // Registration and login for customer
         registerButton.addActionListener(actionEvent -> loginAndRegistrationViewModel.registerButtonClickHandler(userNameTextField.getText(), passwordField.getPassword(), addressTextField.getText(),registrationMainPanel));
 
         // Back to log in

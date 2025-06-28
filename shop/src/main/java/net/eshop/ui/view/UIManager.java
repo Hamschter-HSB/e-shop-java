@@ -6,6 +6,7 @@ import net.eshop.ui.viewmodel.ShopMainViewModel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.sql.SQLOutput;
 import java.util.logging.Logger;
 
 public class UIManager {
@@ -19,8 +20,9 @@ public class UIManager {
     private final MenuItem menuItem = new MenuItem("Close");
     private final MenuItem registerStaffMember = new MenuItem("Register staff member");
 
-    private final LoginAndRegistrationView loginAndRegistrationView;
     private final LoginAndRegistrationViewModel loginAndRegistrationViewModel;
+    private final LoginAndRegistrationView loginAndRegistrationView;
+    private final ShopMainViewModel shopMainViewModel;
     private final ShopMainView shopMainView;
 
 
@@ -31,7 +33,7 @@ public class UIManager {
         loginAndRegistrationViewModel = new LoginAndRegistrationViewModel(dataPersister);
         loginAndRegistrationView = new LoginAndRegistrationView(loginAndRegistrationViewModel);
 
-        ShopMainViewModel shopMainViewModel = new ShopMainViewModel(dataPersister);
+        shopMainViewModel = new ShopMainViewModel(dataPersister);
         shopMainView = new ShopMainView(shopMainViewModel);
     }
 
@@ -41,11 +43,24 @@ public class UIManager {
 
         mainFrame.add(loginAndRegistrationView.login());
 
+        // Starts MainShopView after log in
         loginAndRegistrationViewModel.setLoggedIn(() -> {
             mainFrame.add(shopMainView.shop());
 
             if ("STAFF_MEMBER".equals(System.getProperty("CURRENT_USER")))
                 menuBar.add(staffMember);
+        });
+
+        shopMainViewModel.setRegisteredStaffMember(() -> {
+            System.out.println("DEBUG!");
+            mainFrame.add(shopMainView.shop());
+        });
+
+        registerStaffMember.addActionListener(actionEvent -> {
+            mainFrame.getContentPane().removeAll();
+            mainFrame.add(shopMainView.staffMemberRegistration());
+            mainFrame.revalidate();
+            mainFrame.repaint();
         });
 
         mainFrame.setVisible(true);
