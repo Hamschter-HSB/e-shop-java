@@ -1,6 +1,6 @@
 package net.eshop.ui.view;
 
-import net.eshop.ui.events.RegistrationListener;
+import net.eshop.ui.events.UIBackListener;
 import net.eshop.ui.viewmodel.ShopMainViewModel;
 
 import javax.swing.*;
@@ -12,6 +12,7 @@ public class ShopMainView {
     private static final Logger logger = Logger.getLogger(ShopMainView.class.getName());
 
     private final ShopMainViewModel shopMainViewModel;
+    private UIBackListener uiBackListener;
 
     public ShopMainView(ShopMainViewModel shopMainViewModel) {
         this.shopMainViewModel = shopMainViewModel;
@@ -77,8 +78,11 @@ public class ShopMainView {
 
         // Back to Menu
         backButton.addActionListener(actionEvent -> {
-            //TODO WEITER
-            staffMemberRegisterChildPanel.setVisible(false);
+
+            if (uiBackListener != null) {
+                uiBackListener.onReturn();
+                staffMemberRegisterChildPanel.setVisible(false);
+            }
         });
 
         registerButton.setPreferredSize(buttonDimension);
@@ -104,5 +108,9 @@ public class ShopMainView {
         staffMemberRegistrationMainPanel.setVisible(true);
 
         return staffMemberRegistrationMainPanel;
+    }
+
+    public void setUiBackListener(UIBackListener uiBackListener) {
+        this.uiBackListener = uiBackListener;
     }
 }

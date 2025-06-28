@@ -6,7 +6,6 @@ import net.eshop.ui.viewmodel.ShopMainViewModel;
 
 import javax.swing.*;
 import java.awt.*;
-import java.sql.SQLOutput;
 import java.util.logging.Logger;
 
 public class UIManager {
@@ -43,18 +42,19 @@ public class UIManager {
 
         mainFrame.add(loginAndRegistrationView.login());
 
+        JPanel shopMainVJPanel = shopMainView.shop();
+
         // Starts MainShopView after log in
         loginAndRegistrationViewModel.setLoggedIn(() -> {
-            mainFrame.add(shopMainView.shop());
+            mainFrame.add(shopMainVJPanel);
 
             if ("STAFF_MEMBER".equals(System.getProperty("CURRENT_USER")))
                 menuBar.add(staffMember);
         });
 
-        shopMainViewModel.setRegisteredStaffMember(() -> {
-            System.out.println("DEBUG!");
-            mainFrame.add(shopMainView.shop());
-        });
+        shopMainViewModel.setRegisteredStaffMember(() -> mainFrame.add(shopMainVJPanel));
+
+        shopMainView.setUiBackListener(() -> mainFrame.add(shopMainVJPanel));
 
         registerStaffMember.addActionListener(actionEvent -> {
             mainFrame.getContentPane().removeAll();
@@ -64,7 +64,6 @@ public class UIManager {
         });
 
         mainFrame.setVisible(true);
-
     }
 
     private void setup() {
