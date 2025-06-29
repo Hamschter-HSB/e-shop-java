@@ -6,13 +6,18 @@ import net.eshop.exceptions.UserNotFoundException;
 import java.io.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class StaffMembersFileDAOImpl implements DAO<StaffMember> {
 
     private static final Logger logger = Logger.getLogger(StaffMembersFileDAOImpl.class.getName());
+
+    private final String REG_EX = ".*=";
 
     public static final String DATA_PATH = "Data";
     public static final String STAFF_MEMBERS = "StaffMembers";
@@ -67,11 +72,9 @@ public class StaffMembersFileDAOImpl implements DAO<StaffMember> {
 
             assert duplicateArticles.size() == 4;
 
-            final String regEx = ".*=";
-
-            int number = Integer.parseInt(duplicateArticles.get(0).replaceAll(regEx, ""));
-            String userName = duplicateArticles.get(1).replaceAll(regEx, "");
-            String password = duplicateArticles.get(2).replaceAll(regEx, "");
+            int number = Integer.parseInt(duplicateArticles.get(0).replaceAll(REG_EX, ""));
+            String userName = duplicateArticles.get(1).replaceAll(REG_EX, "");
+            String password = duplicateArticles.get(2).replaceAll(REG_EX, "");
 
             return new StaffMember(number, userName, password);
         }
@@ -79,7 +82,30 @@ public class StaffMembersFileDAOImpl implements DAO<StaffMember> {
 
     @Override
     public List<StaffMember> readAll() throws IOException {
-        return List.of();
+
+        List<StaffMember> allStaffMembers = new ArrayList<>();
+        Set<Integer> allStaffMemberIds = new HashSet<>();
+
+        try (FileReader fileReader = new FileReader(file)) {
+
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            AtomicInteger counter = new AtomicInteger();
+
+            bufferedReader.lines().forEach(line -> {
+                if (counter.getAndIncrement() % 3 == 0) {
+                    allStaffMemberIds.add(Integer.parseInt(line.replaceAll(REG_EX, "")));
+                }
+            });
+
+            allStaffMemberIds.forEach(userID -> {
+                try {
+                    allStaffMembers.add(read(userID));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
+        return allStaffMembers;
     }
 
     @Override

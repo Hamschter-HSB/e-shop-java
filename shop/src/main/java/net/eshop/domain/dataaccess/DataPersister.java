@@ -3,15 +3,22 @@ package net.eshop.domain.dataaccess;
 import net.eshop.domain.BulkArticle;
 import net.eshop.domain.Customer;
 import net.eshop.domain.StaffMember;
+import net.eshop.domain.User;
 import net.eshop.domain.events.StockChange;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class DataPersister {
+
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(DataPersister.class);
 
     private final DAO<BulkArticle> bulkArticleDAO = new BulkArticleFileDAOImpl();
     private final DAO<StaffMember> staffDAO = new StaffMembersFileDAOImpl();
@@ -125,12 +132,12 @@ public class DataPersister {
 
     public List<StockChange> listPastStockChanges(int days, int articleID) {
 
-        if(days > 30)
+        if (days > 30)
             return Collections.emptyList();
 
         BulkArticle bulkArticle = readBulkArticle(articleID);
 
-        if(bulkArticle == null)
+        if (bulkArticle == null)
             return Collections.emptyList();
 
         List<StockChange> stockChange = readAllStockChanges();
@@ -153,5 +160,49 @@ public class DataPersister {
     // TODO REMOVE and use own DAO. Temporary code
     public Customer getCustomer() {
         return customer;
+    }
+
+    public List<Customer> readAllCustomers() {
+        try {
+            return customerDAO.readAll();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<StaffMember> readAllStaffMembers() {
+        try {
+            return staffDAO.readAll();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public <T extends User> T findUserByCredentials(String userName, String password, Class<T> clazz) {
+
+        List<T> allUsers = new ArrayList<>();
+
+        if(!(clazz.equals(Customer.class) || clazz.equals(StaffMember.class))) {
+            throw new IllegalArgumentException("Unknown class " + clazz.getName() + ". Not a sub type of class " + User.class.getName());
+        }
+
+        if(clazz.equals(Customer.class)) {
+            allUsers = (List<T>) readAllCustomers();
+        }
+
+        if(clazz.equals(StaffMember.class)) {
+            allUsers = (List<T>) readAllStaffMembers();
+        }
+
+        T userTryingToLogin = null;
+
+        try {
+            userTryingToLogin = allUsers.stream()
+                    .filter(u -> u.getName().equals(userName) && u.getPassword().equals(password))
+                    .toList().getFirst();
+        } catch (NoSuchElementException ignored) {
+        }
+
+        return userTryingToLogin;
     }
 }
