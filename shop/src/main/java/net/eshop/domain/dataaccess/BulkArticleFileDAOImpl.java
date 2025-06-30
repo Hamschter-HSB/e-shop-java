@@ -102,7 +102,7 @@ class BulkArticleFileDAOImpl implements DAO<BulkArticle> {
             AtomicInteger counter = new AtomicInteger();
 
             bufferedReader.lines().forEach(line -> {
-                if (counter.getAndIncrement() % 5 == 0) {
+                if (counter.getAndIncrement() % 6 == 0) {
                     bulkArticleIDS.add(Integer.parseInt(line.replaceAll(REG_EX, "")));
                 }
             });
