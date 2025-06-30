@@ -1,15 +1,11 @@
 package net.eshop.domain.dataaccess;
 
-import net.eshop.domain.BulkArticle;
 import net.eshop.domain.events.StockChange;
 import net.eshop.exceptions.ArticleNotFoundException;
 
 import java.io.*;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,11 +35,12 @@ public class StockChangeDAOImpl implements DAO<StockChange> {
     @Override
     public void create(StockChange stockChange) throws IOException {
 
-        int id = stockChange.getId();
+        List<StockChange> stockChanges = readAll();
+        int id = 1;
 
-        if (containsStockChange(id)) {
-            logger.info(MessageFormat.format("StockChange with id {0} does already exist!", id));
-            return;
+        try {
+            id = stockChanges.getLast().getId() + 1;
+        } catch (NoSuchElementException ignored) {
         }
 
         try (FileWriter fileWriter = new FileWriter(file, true);

@@ -1,14 +1,18 @@
 package net.eshop.ui.viewmodel;
 
+import net.eshop.domain.BulkArticle;
 import net.eshop.domain.Customer;
 import net.eshop.domain.StaffMember;
 import net.eshop.domain.dataaccess.DataPersister;
+import net.eshop.domain.events.StockChange;
 import net.eshop.ui.DialogUtils;
+import net.eshop.ui.events.LogoutListener;
 import net.eshop.ui.events.RegistrationListener;
 
 import javax.swing.*;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 public class ShopMainViewModel {
@@ -17,6 +21,7 @@ public class ShopMainViewModel {
 
     private final DataPersister dataPersister;
     private RegistrationListener registrationListener;
+    private LogoutListener logoutListener;
 
     public ShopMainViewModel(DataPersister dataPersister) {
         this.dataPersister = dataPersister;
@@ -64,7 +69,62 @@ public class ShopMainViewModel {
         logger.info("Registered customer " + userName + " successfully.");
     }
 
+    public void logOutCurrentUser() {
+        if (logoutListener != null) {
+            logoutListener.onLogoutSuccess();
+
+            System.clearProperty("CURRENT_USER");
+            System.clearProperty("CURRENT_USER_ID");
+
+            logger.info("Successfully logged out user");
+        }
+    }
+
+    public String[][] loadArticles() {
+
+        List<BulkArticle> bulkArticles = dataPersister.readAllBulkArticles();
+        String[][] table = new String[bulkArticles.size()][6];
+
+        AtomicInteger counter = new AtomicInteger(0);
+
+        bulkArticles.forEach(stockChange -> {
+            table[counter.get()][0] = String.valueOf(stockChange.getArticleNumber());
+            table[counter.get()][1] = String.valueOf(stockChange.getName());
+            table[counter.get()][2] = String.valueOf(stockChange.getDescription());
+            table[counter.get()][3] = String.valueOf(stockChange.getStock());
+            table[counter.get()][4] = String.valueOf(stockChange.getPrice());
+            table[counter.get()][5] = String.valueOf(stockChange.getBulkSize());
+            counter.incrementAndGet();
+        });
+
+        return table;
+    }
+
+    public String[][] loadStocks() {
+
+        List<StockChange> stockChanges = dataPersister.readAllStockChanges();
+        String[][] table = new String[stockChanges.size()][6];
+
+        AtomicInteger counter = new AtomicInteger(0);
+
+        stockChanges.forEach(stockChange -> {
+            table[counter.get()][0] = String.valueOf(stockChange.getId());
+            table[counter.get()][1] = String.valueOf(stockChange.getDayOfYear());
+            table[counter.get()][2] = String.valueOf(stockChange.getArticleNumber());
+            table[counter.get()][3] = String.valueOf(stockChange.getOldAmount());
+            table[counter.get()][4] = String.valueOf(stockChange.getNewAmount());
+            table[counter.get()][5] = String.valueOf(stockChange.getUserID());
+            counter.incrementAndGet();
+        });
+
+        return table;
+    }
+
     public void setRegisteredStaffMember(RegistrationListener registrationListener) {
         this.registrationListener = registrationListener;
+    }
+
+    public void setLogoutListener(LogoutListener logoutListener) {
+        this.logoutListener = logoutListener;
     }
 }

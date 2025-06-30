@@ -8,10 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,22 +38,23 @@ class BulkArticleFileDAOImpl implements DAO<BulkArticle> {
     @Override
     public void create(BulkArticle bulkArticle) throws IOException {
 
-        int bulkArticleNumber = bulkArticle.getArticleNumber();
+        List<BulkArticle> bulkArticles = readAll();
+        int id = 1;
 
-        if (containsBulkArticle(bulkArticleNumber)) {
-            logger.info(MessageFormat.format("BulkArticle with articleNumber {0} does already exist!", bulkArticleNumber));
-            return;
+        try {
+            id = bulkArticles.getLast().getArticleNumber() + 1;
+        } catch (NoSuchElementException ignored) {
         }
 
         try (FileWriter fileWriter = new FileWriter(file, true);
              BufferedWriter bufferedReader = new BufferedWriter(fileWriter)) {
 
-            bufferedReader.write(bulkArticleNumber + ".id=" + bulkArticleNumber + "\n");
-            bufferedReader.write(bulkArticleNumber + ".name=" + bulkArticle.getName() + "\n");
-            bufferedReader.write(bulkArticleNumber + ".description=" + bulkArticle.getDescription() + "\n");
-            bufferedReader.write(bulkArticleNumber + ".stock=" + bulkArticle.getStock() + "\n");
-            bufferedReader.write(bulkArticleNumber + ".price=" + bulkArticle.getPrice() + "\n");
-            bufferedReader.write(bulkArticleNumber + ".bulkSize=" + bulkArticle.getBulkSize() + "\n");
+            bufferedReader.write(id + ".id=" + id + "\n");
+            bufferedReader.write(id + ".name=" + bulkArticle.getName() + "\n");
+            bufferedReader.write(id + ".description=" + bulkArticle.getDescription() + "\n");
+            bufferedReader.write(id + ".stock=" + bulkArticle.getStock() + "\n");
+            bufferedReader.write(id + ".price=" + bulkArticle.getPrice() + "\n");
+            bufferedReader.write(id + ".bulkSize=" + bulkArticle.getBulkSize() + "\n");
         }
     }
 
@@ -102,7 +100,7 @@ class BulkArticleFileDAOImpl implements DAO<BulkArticle> {
             AtomicInteger counter = new AtomicInteger();
 
             bufferedReader.lines().forEach(line -> {
-                if (counter.getAndIncrement() % 5 == 0) {
+                if (counter.getAndIncrement() % 6 == 0) {
                     bulkArticleIDS.add(Integer.parseInt(line.replaceAll(REG_EX, "")));
                 }
             });
