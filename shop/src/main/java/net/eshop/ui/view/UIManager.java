@@ -15,10 +15,13 @@ public class UIManager {
 
     private final JFrame mainFrame = new JFrame("E-Shop");
     private final MenuBar menuBar = new MenuBar();
+    private final Menu mainMenu = new Menu("Menu");
+    private final MenuItem articles = new MenuItem("Articles");
     private final Menu staffMember = new Menu("Staff");
     private final MenuItem registerStaffMember = new MenuItem("Register staff member");
     private final Menu manageArticlesMenu = new Menu("Articles");
     private final MenuItem addArticles = new MenuItem("Add...");
+    private final MenuItem stockChanges = new MenuItem("Stock changes");
 
     private final LoginAndRegistrationViewModel loginAndRegistrationViewModel;
     private final LoginAndRegistrationView loginAndRegistrationView;
@@ -51,6 +54,8 @@ public class UIManager {
         loginAndRegistrationViewModel.setLoggedIn(() -> {
             mainFrame.add(shopMainViewJPanel);
 
+            mainFrame.setMenuBar(menuBar);
+
             if ("STAFF_MEMBER".equals(System.getProperty("CURRENT_USER")))
                 menuBar.add(staffMember);
         });
@@ -64,6 +69,7 @@ public class UIManager {
                     mainFrame.revalidate();
                     mainFrame.repaint();
 
+                    mainFrame.setMenuBar(null);
                     menuBar.remove(staffMember);
                 }
         );
@@ -87,6 +93,16 @@ public class UIManager {
         // ManageArticles/AddArticle
         addArticles.addActionListener(actionEvent -> new AddArticleDialogView(addArticleDialogViewModel, mainFrame).openAddArticleDialog());
 
+        // Open stock changes in ShopMainView
+        stockChanges.addActionListener(actionEvent -> {
+            shopMainView.activateStockChangesPanel();
+        });
+
+        // Open articles in ShopMainView
+        articles.addActionListener(actionEvent -> {
+            shopMainView.activateArticleListPanel();
+        });
+
         mainFrame.setVisible(true);
     }
 
@@ -95,13 +111,16 @@ public class UIManager {
         mainFrame.setLayout(new BorderLayout());
         mainFrame.setTitle("Hamschter Inc.");
 
-        mainFrame.setMenuBar(menuBar);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
-        staffMember.add(registerStaffMember);
+        mainMenu.add(articles);
+        menuBar.add(mainMenu);
 
+        staffMember.add(registerStaffMember);
         staffMember.add(manageArticlesMenu);
+        staffMember.add(stockChanges);
+
         manageArticlesMenu.add(addArticles);
     }
 }

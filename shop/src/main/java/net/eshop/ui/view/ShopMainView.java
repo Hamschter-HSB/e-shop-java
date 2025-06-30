@@ -17,13 +17,14 @@ public class ShopMainView {
     private final ShopMainViewModel shopMainViewModel;
     private UIBackListener uiBackListener;
 
+    private final JPanel shopMainPanel = new JPanel(new BorderLayout());
+    private JScrollPane currentCenterPane;
+
     public ShopMainView(ShopMainViewModel shopMainViewModel) {
         this.shopMainViewModel = shopMainViewModel;
     }
 
     public JPanel shop() {
-        // Panels
-        JPanel shopMainPanel = new JPanel(new BorderLayout());
 
         // Header
         JPanel headerPanel = new JPanel(new BorderLayout());
@@ -56,28 +57,9 @@ public class ShopMainView {
 
         shopMainPanel.add(sidebar, BorderLayout.WEST);
 
-        // Table
-        String[] columns = {"Article number", "Article name", "Description", "Price", "Stock", ""};
-        String[][] data = {
-                {"412", "12x Becks Lemon", "Lecker Lecker Bierchen für Pussys", "25$", "10", "Add to Cart"},
-                {"221", "6x Paulaner Spezi", "Nur die Harten komm in Garten", "20$", "200", "Add to Cart"}
-        };
+        currentCenterPane = articleListJScrollPane();
 
-        DefaultTableModel defaultTableModel = new DefaultTableModel(data, columns) {
-            public boolean isCellEditable(int row, int column) {
-                return column == 5;
-            }
-        };
-        JTable table = new JTable(defaultTableModel);
-
-        TableRowSorter<TableModel> sorter = new TableRowSorter<>(defaultTableModel);
-        table.setRowSorter(sorter);
-//            table.getColumnModel().getColumn(4).setCellRenderer(new ButtonRenderer());
-//            table.getColumnModel().getColumn(4).setCellEditor(new ButtonEditor(new JCheckBox()));
-
-        JScrollPane scrollPane = new JScrollPane(table);
-        shopMainPanel.add(scrollPane, BorderLayout.CENTER);
-
+        shopMainPanel.add(currentCenterPane, BorderLayout.CENTER);
         shopMainPanel.setVisible(true);
 
         return shopMainPanel;
@@ -134,6 +116,60 @@ public class ShopMainView {
         staffMemberRegistrationMainPanel.setVisible(true);
 
         return staffMemberRegistrationMainPanel;
+    }
+
+    private JScrollPane articleListJScrollPane() {
+
+        // Table
+        String[] columns = {"Article number", "Article name", "Description", "Price", "Stock", ""};
+        String[][] data = shopMainViewModel.loadArticles();
+
+        DefaultTableModel defaultTableModel = new DefaultTableModel(data, columns) {
+            public boolean isCellEditable(int row, int column) {
+                return column == 5;
+            }
+        };
+        JTable table = new JTable(defaultTableModel);
+
+        TableRowSorter<TableModel> sorter = new TableRowSorter<>(defaultTableModel);
+        table.setRowSorter(sorter);
+//            table.getColumnModel().getColumn(4).setCellRenderer(new ButtonRenderer());
+//            table.getColumnModel().getColumn(4).setCellEditor(new ButtonEditor(new JCheckBox()));
+
+        return new JScrollPane(table);
+    }
+
+    private JScrollPane stockJScrollPane() {
+
+        // Table
+        String[] columns = {"id", "Day of year", "Number", "Old amount", "New amount", "Edited by User"};
+        String[][] data = shopMainViewModel.loadStocks();
+
+        DefaultTableModel defaultTableModel = new DefaultTableModel(data, columns) {
+            public boolean isCellEditable(int row, int column) {
+                return column == 5;
+            }
+        };
+        JTable table = new JTable(defaultTableModel);
+
+        TableRowSorter<TableModel> sorter = new TableRowSorter<>(defaultTableModel);
+        table.setRowSorter(sorter);
+
+        return new JScrollPane(table);
+    }
+
+    public void activateStockChangesPanel() {
+        shopMainPanel.remove(currentCenterPane);
+        shopMainPanel.add(currentCenterPane = stockJScrollPane(), BorderLayout.CENTER);
+        shopMainPanel.revalidate();
+        shopMainPanel.repaint();
+    }
+
+    public void activateArticleListPanel() {
+        shopMainPanel.remove(currentCenterPane);
+        shopMainPanel.add(currentCenterPane = articleListJScrollPane(), BorderLayout.CENTER);
+        shopMainPanel.revalidate();
+        shopMainPanel.repaint();
     }
 
     public void setUiBackListener(UIBackListener uiBackListener) {
