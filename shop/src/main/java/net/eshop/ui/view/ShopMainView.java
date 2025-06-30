@@ -41,7 +41,7 @@ public class ShopMainView {
         sidebar.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         JTextField searchField = new JTextField(10);
-        JButton searchButton = new JButton("Suchen");
+        JButton searchButton = new JButton("Search");
         JPanel searchPanel = new JPanel();
         searchPanel.add(searchField);
         searchPanel.add(searchButton);
