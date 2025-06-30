@@ -2,6 +2,7 @@ package net.eshop.ui.view;
 
 import net.eshop.ui.events.UIBackListener;
 import net.eshop.ui.viewmodel.ShopMainViewModel;
+import net.eshop.ui.viewmodel.ViewModelUtils;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -121,7 +122,7 @@ public class ShopMainView {
     private JScrollPane articleListJScrollPane() {
 
         // Table
-        String[] columns = {"Article number", "Article name", "Description", "Price", "Stock", ""};
+        String[] columns = {"Article number", "Article name", "Description", "Stock", "Price", "Bulk size"};
         String[][] data = shopMainViewModel.loadArticles();
 
         DefaultTableModel defaultTableModel = new DefaultTableModel(data, columns) {
@@ -130,6 +131,9 @@ public class ShopMainView {
             }
         };
         JTable table = new JTable(defaultTableModel);
+
+        if (!ViewModelUtils.currentUserIsStaffMember())
+            table.removeColumn(table.getColumnModel().getColumn(3));
 
         TableRowSorter<TableModel> sorter = new TableRowSorter<>(defaultTableModel);
         table.setRowSorter(sorter);

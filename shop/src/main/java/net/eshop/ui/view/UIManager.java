@@ -4,6 +4,7 @@ import net.eshop.domain.dataaccess.DataPersister;
 import net.eshop.ui.viewmodel.AddArticleDialogViewModel;
 import net.eshop.ui.viewmodel.LoginAndRegistrationViewModel;
 import net.eshop.ui.viewmodel.ShopMainViewModel;
+import net.eshop.ui.viewmodel.ViewModelUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -56,8 +57,14 @@ public class UIManager {
 
             mainFrame.setMenuBar(menuBar);
 
-            if ("STAFF_MEMBER".equals(System.getProperty("CURRENT_USER")))
+            if (ViewModelUtils.currentUserIsStaffMember()) {
                 menuBar.add(staffMember);
+
+                // We have to do this call to solve the issue that the current user is not set, before a log ing.
+                // This causes that when a staff member logs in, he won't see the article stocks in the article list.
+                // This simple call fixes the article list for a staff member
+                shopMainView.activateArticleListPanel();
+            }
         });
 
         shopMainViewModel.setRegisteredStaffMember(() -> mainFrame.add(shopMainViewJPanel));
