@@ -4,6 +4,9 @@ import net.eshop.ui.events.UIBackListener;
 import net.eshop.ui.viewmodel.ShopMainViewModel;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.util.logging.Logger;
 
@@ -22,35 +25,58 @@ public class ShopMainView {
         // Panels
         JPanel shopMainPanel = new JPanel(new BorderLayout());
 
-        JPanel shopSidePanel = new JPanel(new BorderLayout());
+        // Header
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        JLabel storeLabel = new JLabel("STORE", SwingConstants.CENTER);
+        storeLabel.setFont(new Font("Arial", Font.BOLD, 40));
+        headerPanel.add(storeLabel, BorderLayout.CENTER);
 
-        JPanel shopCenterPanel = new JPanel();
-
-        // Content of shopMainPanel.NORTH
-        JLabel shopLabel = new JLabel("Shop");
         JButton cartButton = new JButton("Cart");
+        headerPanel.add(cartButton, BorderLayout.EAST);
+        shopMainPanel.add(headerPanel, BorderLayout.NORTH);
 
-        // Content of shopSidePanel
-        JTextField searchTextField = new JTextField();
-        JButton searchButton = new JButton("Search");
+        // Sidebar (left)
+        JPanel sidebar = new JPanel();
+        sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
+        sidebar.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        JLabel hamschterLabel = new JLabel("Hamschter Inc.");
-        JLabel logoutLabel = new JLabel("<HTML><U>Logout</U></HTML>");
-        logoutLabel.setForeground(Color.BLUE);
+        JTextField searchField = new JTextField(10);
+        JButton searchButton = new JButton("Suchen");
+        JPanel searchPanel = new JPanel();
+        searchPanel.add(searchField);
+        searchPanel.add(searchButton);
+        sidebar.add(searchPanel);
 
-        // Filling shopMainPanel
-        shopMainPanel.add(shopLabel, BorderLayout.NORTH);
-        shopMainPanel.add(cartButton, BorderLayout.NORTH);
+        sidebar.add(Box.createVerticalGlue());
+        sidebar.add(new JLabel("Hamschter Inc."));
+        JButton logoutButton = new JButton("Logout");
+        logoutButton.addActionListener(actionEvent -> shopMainViewModel.logOutCurrentUser());
 
-        shopMainPanel.add(shopSidePanel, BorderLayout.WEST);
-        shopMainPanel.add(shopCenterPanel, BorderLayout.CENTER);
+        sidebar.add(logoutButton);
 
-        // Filling shopSidePanel
-        shopSidePanel.add(searchTextField, BorderLayout.NORTH);
-        shopSidePanel.add(searchButton, BorderLayout.NORTH);
+        shopMainPanel.add(sidebar, BorderLayout.WEST);
 
-        shopSidePanel.add(hamschterLabel, BorderLayout.SOUTH);
-        shopSidePanel.add(logoutLabel, BorderLayout.SOUTH);
+        // Table
+        String[] columns = {"Article number", "Article name", "Description", "Price", "Stock", ""};
+        String[][] data = {
+                {"412", "12x Becks Lemon", "Lecker Lecker Bierchen für Pussys", "25$", "10", "Add to Cart"},
+                {"221", "6x Paulaner Spezi", "Nur die Harten komm in Garten", "20$", "200", "Add to Cart"}
+        };
+
+        DefaultTableModel defaultTableModel = new DefaultTableModel(data, columns) {
+            public boolean isCellEditable(int row, int column) {
+                return column == 5;
+            }
+        };
+        JTable table = new JTable(defaultTableModel);
+
+        TableRowSorter<TableModel> sorter = new TableRowSorter<>(defaultTableModel);
+        table.setRowSorter(sorter);
+//            table.getColumnModel().getColumn(4).setCellRenderer(new ButtonRenderer());
+//            table.getColumnModel().getColumn(4).setCellEditor(new ButtonEditor(new JCheckBox()));
+
+        JScrollPane scrollPane = new JScrollPane(table);
+        shopMainPanel.add(scrollPane, BorderLayout.CENTER);
 
         shopMainPanel.setVisible(true);
 

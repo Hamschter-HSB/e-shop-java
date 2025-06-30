@@ -4,6 +4,7 @@ import net.eshop.domain.Customer;
 import net.eshop.domain.StaffMember;
 import net.eshop.domain.dataaccess.DataPersister;
 import net.eshop.ui.DialogUtils;
+import net.eshop.ui.events.LogoutListener;
 import net.eshop.ui.events.RegistrationListener;
 
 import javax.swing.*;
@@ -17,6 +18,7 @@ public class ShopMainViewModel {
 
     private final DataPersister dataPersister;
     private RegistrationListener registrationListener;
+    private LogoutListener logoutListener;
 
     public ShopMainViewModel(DataPersister dataPersister) {
         this.dataPersister = dataPersister;
@@ -64,7 +66,22 @@ public class ShopMainViewModel {
         logger.info("Registered customer " + userName + " successfully.");
     }
 
+    public void logOutCurrentUser() {
+        if (logoutListener != null) {
+            logoutListener.onLogoutSuccess();
+
+            System.clearProperty("CURRENT_USER");
+            System.clearProperty("CURRENT_USER_ID");
+
+            logger.info("Successfully logged out user");
+        }
+    }
+
     public void setRegisteredStaffMember(RegistrationListener registrationListener) {
         this.registrationListener = registrationListener;
+    }
+
+    public void setLogoutListener(LogoutListener logoutListener) {
+        this.logoutListener = logoutListener;
     }
 }

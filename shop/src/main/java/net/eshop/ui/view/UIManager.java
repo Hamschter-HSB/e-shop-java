@@ -38,22 +38,38 @@ public class UIManager {
 
         setup();
 
-        mainFrame.add(loginAndRegistrationView.login());
+        JPanel loginAndRegistrationViewJPanel = loginAndRegistrationView.login();
+        mainFrame.add(loginAndRegistrationViewJPanel);
 
-        JPanel shopMainVJPanel = shopMainView.shop();
-
+        JPanel shopMainViewJPanel = shopMainView.shop();
         // Starts MainShopView after log in
         loginAndRegistrationViewModel.setLoggedIn(() -> {
-            mainFrame.add(shopMainVJPanel);
+            mainFrame.add(shopMainViewJPanel);
 
             if ("STAFF_MEMBER".equals(System.getProperty("CURRENT_USER")))
                 menuBar.add(staffMember);
         });
 
-        shopMainViewModel.setRegisteredStaffMember(() -> mainFrame.add(shopMainVJPanel));
+        shopMainViewModel.setRegisteredStaffMember(() -> mainFrame.add(shopMainViewJPanel));
+
+        // Logout current user (revokes CURRENT_USER property)
+        shopMainViewModel.setLogoutListener(() -> {
+                    mainFrame.getContentPane().removeAll();
+                    mainFrame.add(loginAndRegistrationViewJPanel);
+                    mainFrame.revalidate();
+                    mainFrame.repaint();
+
+                    menuBar.remove(staffMember);
+                }
+        );
 
         // Back from staff member registration ui
-        shopMainView.setUiBackListener(() -> mainFrame.add(shopMainVJPanel));
+        shopMainView.setUiBackListener(() -> {
+            mainFrame.getContentPane().removeAll();
+            mainFrame.add(shopMainViewJPanel);
+            mainFrame.revalidate();
+            mainFrame.repaint();
+        });
 
         registerStaffMember.addActionListener(actionEvent -> {
             mainFrame.getContentPane().removeAll();
