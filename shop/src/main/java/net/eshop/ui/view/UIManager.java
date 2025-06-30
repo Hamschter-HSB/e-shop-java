@@ -14,8 +14,7 @@ public class UIManager {
 
     private final JFrame mainFrame = new JFrame("E-Shop");
     private final MenuBar menuBar = new MenuBar();
-    private final Menu staffMember = new Menu("StaffMember");
-    private final MenuItem menuItem = new MenuItem("Close");
+    private final Menu staffMember = new Menu("Staff");
     private final MenuItem registerStaffMember = new MenuItem("Register staff member");
 
     private final LoginAndRegistrationViewModel loginAndRegistrationViewModel;
@@ -69,12 +68,12 @@ public class UIManager {
     private void setup() {
 
         mainFrame.setLayout(new BorderLayout());
-
-        staffMember.add(registerStaffMember);
+        mainFrame.setTitle("Hamschter Inc.");
 
         mainFrame.setMenuBar(menuBar);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
-        mainFrame.setSize(1920, 1080);
+        staffMember.add(registerStaffMember);
     }
 }
