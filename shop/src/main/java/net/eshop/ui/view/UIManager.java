@@ -1,6 +1,7 @@
 package net.eshop.ui.view;
 
 import net.eshop.domain.dataaccess.DataPersister;
+import net.eshop.ui.viewmodel.AddArticleDialogViewModel;
 import net.eshop.ui.viewmodel.LoginAndRegistrationViewModel;
 import net.eshop.ui.viewmodel.ShopMainViewModel;
 
@@ -16,11 +17,14 @@ public class UIManager {
     private final MenuBar menuBar = new MenuBar();
     private final Menu staffMember = new Menu("Staff");
     private final MenuItem registerStaffMember = new MenuItem("Register staff member");
+    private final Menu manageArticlesMenu = new Menu("Articles");
+    private final MenuItem addArticles = new MenuItem("Add...");
 
     private final LoginAndRegistrationViewModel loginAndRegistrationViewModel;
     private final LoginAndRegistrationView loginAndRegistrationView;
     private final ShopMainViewModel shopMainViewModel;
     private final ShopMainView shopMainView;
+    private final AddArticleDialogViewModel addArticleDialogViewModel;
 
 
     public UIManager() {
@@ -32,6 +36,8 @@ public class UIManager {
 
         shopMainViewModel = new ShopMainViewModel(dataPersister);
         shopMainView = new ShopMainView(shopMainViewModel);
+
+        addArticleDialogViewModel = new AddArticleDialogViewModel(dataPersister);
     }
 
     public void start() {
@@ -70,12 +76,16 @@ public class UIManager {
             mainFrame.repaint();
         });
 
+        // Register staff member
         registerStaffMember.addActionListener(actionEvent -> {
             mainFrame.getContentPane().removeAll();
             mainFrame.add(shopMainView.staffMemberRegistration());
             mainFrame.revalidate();
             mainFrame.repaint();
         });
+
+        // ManageArticles/AddArticle
+        addArticles.addActionListener(actionEvent -> new AddArticleDialogView(addArticleDialogViewModel, mainFrame).openAddArticleDialog());
 
         mainFrame.setVisible(true);
     }
@@ -90,5 +100,8 @@ public class UIManager {
         mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
         staffMember.add(registerStaffMember);
+
+        staffMember.add(manageArticlesMenu);
+        manageArticlesMenu.add(addArticles);
     }
 }
