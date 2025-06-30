@@ -37,11 +37,13 @@ public class CustomerFileDAOImpl implements DAO<Customer> {
 
     @Override
     public void create(Customer customer) throws IOException {
-        int id = customer.getNumber();
 
-        if (containsUser(id)) {
-            logger.info(MessageFormat.format("StaffMember with number {0} does already exist!", id));
-            return;
+        List<Customer> customers = readAll();
+        int id = 1;
+
+        try {
+            id = customers.getLast().getNumber() + 1;
+        } catch (NoSuchElementException ignored) {
         }
 
         try (FileWriter fileWriter = new FileWriter(file, true);

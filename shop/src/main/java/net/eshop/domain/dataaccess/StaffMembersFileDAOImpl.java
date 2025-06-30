@@ -5,10 +5,7 @@ import net.eshop.exceptions.UserNotFoundException;
 
 import java.io.*;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,11 +34,13 @@ public class StaffMembersFileDAOImpl implements DAO<StaffMember> {
 
     @Override
     public void create(StaffMember staffMember) throws IOException {
-        int id = staffMember.getNumber();
 
-        if (containsStaffMember(id)) {
-            logger.info(MessageFormat.format("StaffMember with number {0} does already exist!", id));
-            return;
+        List<StaffMember> staffMembers = readAll();
+        int id = 1;
+
+        try {
+            id = staffMembers.getLast().getNumber() + 1;
+        } catch (NoSuchElementException ignored) {
         }
 
         try (FileWriter fileWriter = new FileWriter(file, true);
