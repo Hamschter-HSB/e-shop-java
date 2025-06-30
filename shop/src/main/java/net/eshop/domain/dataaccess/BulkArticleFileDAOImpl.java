@@ -39,12 +39,19 @@ class BulkArticleFileDAOImpl implements DAO<BulkArticle> {
     public void create(BulkArticle bulkArticle) throws IOException {
 
         List<BulkArticle> bulkArticles = readAll();
-        int id = 1;
 
-        try {
-            id = bulkArticles.getLast().getArticleNumber() + 1;
-        } catch (NoSuchElementException ignored) {
-        }
+        // Since update() deletes and adds a new article, we have to check if the
+        // article is new (-1) or already exists (!=(-1)) and treat it accordingly
+        int id = 1;
+        if (bulkArticle.getArticleNumber() == -1) {
+
+            try {
+                id = bulkArticles.getLast().getArticleNumber() + 1;
+            } catch (NoSuchElementException ignored) {
+            }
+
+        } else
+            id = bulkArticle.getArticleNumber();
 
         try (FileWriter fileWriter = new FileWriter(file, true);
              BufferedWriter bufferedReader = new BufferedWriter(fileWriter)) {
