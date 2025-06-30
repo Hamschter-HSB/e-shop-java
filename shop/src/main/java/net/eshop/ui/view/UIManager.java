@@ -38,8 +38,7 @@ public class UIManager {
 
         setup();
 
-        JPanel loginAndRegistrationViewJPanel = loginAndRegistrationView.login();
-        mainFrame.add(loginAndRegistrationViewJPanel);
+        mainFrame.add(loginAndRegistrationView.login());
 
         JPanel shopMainViewJPanel = shopMainView.shop();
         // Starts MainShopView after log in
@@ -55,7 +54,7 @@ public class UIManager {
         // Logout current user (revokes CURRENT_USER property)
         shopMainViewModel.setLogoutListener(() -> {
                     mainFrame.getContentPane().removeAll();
-                    mainFrame.add(loginAndRegistrationViewJPanel);
+                    mainFrame.add(loginAndRegistrationView.login());
                     mainFrame.revalidate();
                     mainFrame.repaint();
 
