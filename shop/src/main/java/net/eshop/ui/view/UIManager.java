@@ -1,8 +1,10 @@
 package net.eshop.ui.view;
 
 import net.eshop.domain.dataaccess.DataPersister;
+import net.eshop.ui.viewmodel.AddArticleDialogViewModel;
 import net.eshop.ui.viewmodel.LoginAndRegistrationViewModel;
 import net.eshop.ui.viewmodel.ShopMainViewModel;
+import net.eshop.ui.viewmodel.ViewModelUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,14 +16,19 @@ public class UIManager {
 
     private final JFrame mainFrame = new JFrame("E-Shop");
     private final MenuBar menuBar = new MenuBar();
-    private final Menu staffMember = new Menu("StaffMember");
-    private final MenuItem menuItem = new MenuItem("Close");
+    private final Menu mainMenu = new Menu("Menu");
+    private final MenuItem articles = new MenuItem("Articles");
+    private final Menu staffMember = new Menu("Staff");
     private final MenuItem registerStaffMember = new MenuItem("Register staff member");
+    private final Menu manageArticlesMenu = new Menu("Articles");
+    private final MenuItem addArticles = new MenuItem("Add...");
+    private final MenuItem stockChanges = new MenuItem("Stock changes");
 
     private final LoginAndRegistrationViewModel loginAndRegistrationViewModel;
     private final LoginAndRegistrationView loginAndRegistrationView;
     private final ShopMainViewModel shopMainViewModel;
     private final ShopMainView shopMainView;
+    private final AddArticleDialogViewModel addArticleDialogViewModel;
 
 
     public UIManager() {
@@ -33,6 +40,8 @@ public class UIManager {
 
         shopMainViewModel = new ShopMainViewModel(dataPersister);
         shopMainView = new ShopMainView(shopMainViewModel);
+
+        addArticleDialogViewModel = new AddArticleDialogViewModel(dataPersister);
     }
 
     public void start() {
@@ -41,26 +50,64 @@ public class UIManager {
 
         mainFrame.add(loginAndRegistrationView.login());
 
-        JPanel shopMainVJPanel = shopMainView.shop();
-
+        JPanel shopMainViewJPanel = shopMainView.shop();
         // Starts MainShopView after log in
         loginAndRegistrationViewModel.setLoggedIn(() -> {
-            mainFrame.add(shopMainVJPanel);
+            mainFrame.add(shopMainViewJPanel);
 
-            if ("STAFF_MEMBER".equals(System.getProperty("CURRENT_USER")))
+            mainFrame.setMenuBar(menuBar);
+
+            if (ViewModelUtils.currentUserIsStaffMember()) {
                 menuBar.add(staffMember);
+
+                // We have to do this call to solve the issue that the current user is not set, before a log ing.
+                // This causes that when a staff member logs in, he won't see the article stocks in the article list.
+                // This simple call fixes the article list for a staff member
+                shopMainView.activateArticleListPanel();
+            }
         });
 
-        shopMainViewModel.setRegisteredStaffMember(() -> mainFrame.add(shopMainVJPanel));
+        shopMainViewModel.setRegisteredStaffMember(() -> mainFrame.add(shopMainViewJPanel));
+
+        // Logout current user (revokes CURRENT_USER property)
+        shopMainViewModel.setLogoutListener(() -> {
+                    mainFrame.getContentPane().removeAll();
+                    mainFrame.add(loginAndRegistrationView.login());
+                    mainFrame.revalidate();
+                    mainFrame.repaint();
+
+                    mainFrame.setMenuBar(null);
+                    menuBar.remove(staffMember);
+                }
+        );
 
         // Back from staff member registration ui
-        shopMainView.setUiBackListener(() -> mainFrame.add(shopMainVJPanel));
+        shopMainView.setUiBackListener(() -> {
+            mainFrame.getContentPane().removeAll();
+            mainFrame.add(shopMainViewJPanel);
+            mainFrame.revalidate();
+            mainFrame.repaint();
+        });
 
+        // Register staff member
         registerStaffMember.addActionListener(actionEvent -> {
             mainFrame.getContentPane().removeAll();
             mainFrame.add(shopMainView.staffMemberRegistration());
             mainFrame.revalidate();
             mainFrame.repaint();
+        });
+
+        // ManageArticles/AddArticle
+        addArticles.addActionListener(actionEvent -> new AddArticleDialogView(addArticleDialogViewModel, mainFrame).openAddArticleDialog());
+
+        // Open stock changes in ShopMainView
+        stockChanges.addActionListener(actionEvent -> {
+            shopMainView.activateStockChangesPanel();
+        });
+
+        // Open articles in ShopMainView
+        articles.addActionListener(actionEvent -> {
+            shopMainView.activateArticleListPanel();
         });
 
         mainFrame.setVisible(true);
@@ -69,12 +116,18 @@ public class UIManager {
     private void setup() {
 
         mainFrame.setLayout(new BorderLayout());
+        mainFrame.setTitle("Hamschter Inc.");
+
+        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+
+        mainMenu.add(articles);
+        menuBar.add(mainMenu);
 
         staffMember.add(registerStaffMember);
+        staffMember.add(manageArticlesMenu);
+        staffMember.add(stockChanges);
 
-        mainFrame.setMenuBar(menuBar);
-        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        mainFrame.setSize(1920, 1080);
+        manageArticlesMenu.add(addArticles);
     }
 }

@@ -2,8 +2,12 @@ package net.eshop.ui.view;
 
 import net.eshop.ui.events.UIBackListener;
 import net.eshop.ui.viewmodel.ShopMainViewModel;
+import net.eshop.ui.viewmodel.ViewModelUtils;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.util.logging.Logger;
 
@@ -14,44 +18,49 @@ public class ShopMainView {
     private final ShopMainViewModel shopMainViewModel;
     private UIBackListener uiBackListener;
 
+    private final JPanel shopMainPanel = new JPanel(new BorderLayout());
+    private JScrollPane currentCenterPane;
+
     public ShopMainView(ShopMainViewModel shopMainViewModel) {
         this.shopMainViewModel = shopMainViewModel;
     }
 
     public JPanel shop() {
-        // Panels
-        JPanel shopMainPanel = new JPanel(new BorderLayout());
 
-        JPanel shopSidePanel = new JPanel(new BorderLayout());
+        // Header
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        JLabel storeLabel = new JLabel("STORE", SwingConstants.CENTER);
+        storeLabel.setFont(new Font("Arial", Font.BOLD, 40));
+        headerPanel.add(storeLabel, BorderLayout.CENTER);
 
-        JPanel shopCenterPanel = new JPanel();
-
-        // Content of shopMainPanel.NORTH
-        JLabel shopLabel = new JLabel("Shop");
         JButton cartButton = new JButton("Cart");
+        headerPanel.add(cartButton, BorderLayout.EAST);
+        shopMainPanel.add(headerPanel, BorderLayout.NORTH);
 
-        // Content of shopSidePanel
-        JTextField searchTextField = new JTextField();
+        // Sidebar (left)
+        JPanel sidebar = new JPanel();
+        sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
+        sidebar.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JTextField searchField = new JTextField(10);
         JButton searchButton = new JButton("Search");
+        JPanel searchPanel = new JPanel();
+        searchPanel.add(searchField);
+        searchPanel.add(searchButton);
+        sidebar.add(searchPanel);
 
-        JLabel hamschterLabel = new JLabel("Hamschter Inc.");
-        JLabel logoutLabel = new JLabel("<HTML><U>Logout</U></HTML>");
-        logoutLabel.setForeground(Color.BLUE);
+        sidebar.add(Box.createVerticalGlue());
+        sidebar.add(new JLabel("Hamschter Inc."));
+        JButton logoutButton = new JButton("Logout");
+        logoutButton.addActionListener(actionEvent -> shopMainViewModel.logOutCurrentUser());
 
-        // Filling shopMainPanel
-        shopMainPanel.add(shopLabel, BorderLayout.NORTH);
-        shopMainPanel.add(cartButton, BorderLayout.NORTH);
+        sidebar.add(logoutButton);
 
-        shopMainPanel.add(shopSidePanel, BorderLayout.WEST);
-        shopMainPanel.add(shopCenterPanel, BorderLayout.CENTER);
+        shopMainPanel.add(sidebar, BorderLayout.WEST);
 
-        // Filling shopSidePanel
-        shopSidePanel.add(searchTextField, BorderLayout.NORTH);
-        shopSidePanel.add(searchButton, BorderLayout.NORTH);
+        currentCenterPane = articleListJScrollPane();
 
-        shopSidePanel.add(hamschterLabel, BorderLayout.SOUTH);
-        shopSidePanel.add(logoutLabel, BorderLayout.SOUTH);
-
+        shopMainPanel.add(currentCenterPane, BorderLayout.CENTER);
         shopMainPanel.setVisible(true);
 
         return shopMainPanel;
@@ -108,6 +117,63 @@ public class ShopMainView {
         staffMemberRegistrationMainPanel.setVisible(true);
 
         return staffMemberRegistrationMainPanel;
+    }
+
+    private JScrollPane articleListJScrollPane() {
+
+        // Table
+        String[] columns = {"Article number", "Article name", "Description", "Stock", "Price", "Bulk size"};
+        String[][] data = shopMainViewModel.loadArticles();
+
+        DefaultTableModel defaultTableModel = new DefaultTableModel(data, columns) {
+            public boolean isCellEditable(int row, int column) {
+                return column == 5;
+            }
+        };
+        JTable table = new JTable(defaultTableModel);
+
+        if (!ViewModelUtils.currentUserIsStaffMember())
+            table.removeColumn(table.getColumnModel().getColumn(3));
+
+        TableRowSorter<TableModel> sorter = new TableRowSorter<>(defaultTableModel);
+        table.setRowSorter(sorter);
+//            table.getColumnModel().getColumn(4).setCellRenderer(new ButtonRenderer());
+//            table.getColumnModel().getColumn(4).setCellEditor(new ButtonEditor(new JCheckBox()));
+
+        return new JScrollPane(table);
+    }
+
+    private JScrollPane stockJScrollPane() {
+
+        // Table
+        String[] columns = {"id", "Day of year", "Number", "Old amount", "New amount", "Edited by User"};
+        String[][] data = shopMainViewModel.loadStocks();
+
+        DefaultTableModel defaultTableModel = new DefaultTableModel(data, columns) {
+            public boolean isCellEditable(int row, int column) {
+                return column == 5;
+            }
+        };
+        JTable table = new JTable(defaultTableModel);
+
+        TableRowSorter<TableModel> sorter = new TableRowSorter<>(defaultTableModel);
+        table.setRowSorter(sorter);
+
+        return new JScrollPane(table);
+    }
+
+    public void activateStockChangesPanel() {
+        shopMainPanel.remove(currentCenterPane);
+        shopMainPanel.add(currentCenterPane = stockJScrollPane(), BorderLayout.CENTER);
+        shopMainPanel.revalidate();
+        shopMainPanel.repaint();
+    }
+
+    public void activateArticleListPanel() {
+        shopMainPanel.remove(currentCenterPane);
+        shopMainPanel.add(currentCenterPane = articleListJScrollPane(), BorderLayout.CENTER);
+        shopMainPanel.revalidate();
+        shopMainPanel.repaint();
     }
 
     public void setUiBackListener(UIBackListener uiBackListener) {
