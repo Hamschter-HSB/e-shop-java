@@ -1,10 +1,7 @@
 package net.eshop.ui.view;
 
 import net.eshop.domain.dataaccess.DataPersister;
-import net.eshop.ui.viewmodel.AddArticleDialogViewModel;
-import net.eshop.ui.viewmodel.LoginAndRegistrationViewModel;
-import net.eshop.ui.viewmodel.ShopMainViewModel;
-import net.eshop.ui.viewmodel.ViewModelUtils;
+import net.eshop.ui.viewmodel.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,12 +20,14 @@ public class UIManager {
     private final Menu manageArticlesMenu = new Menu("Articles");
     private final MenuItem addArticles = new MenuItem("Add...");
     private final MenuItem stockChanges = new MenuItem("Stock changes");
+    private final MenuItem editStock = new MenuItem("Edit stock...");
 
     private final LoginAndRegistrationViewModel loginAndRegistrationViewModel;
     private final LoginAndRegistrationView loginAndRegistrationView;
     private final ShopMainViewModel shopMainViewModel;
     private final ShopMainView shopMainView;
     private final AddArticleDialogViewModel addArticleDialogViewModel;
+    private final EditArticleStockDialogViewModel editArticleStockDialogViewModel;
 
 
     public UIManager() {
@@ -42,6 +41,7 @@ public class UIManager {
         shopMainView = new ShopMainView(shopMainViewModel);
 
         addArticleDialogViewModel = new AddArticleDialogViewModel(dataPersister);
+        editArticleStockDialogViewModel = new EditArticleStockDialogViewModel(dataPersister);
     }
 
     public void start() {
@@ -98,7 +98,16 @@ public class UIManager {
         });
 
         // ManageArticles/AddArticle
-        addArticles.addActionListener(actionEvent -> new AddArticleDialogView(addArticleDialogViewModel, mainFrame).openAddArticleDialog());
+        addArticles.addActionListener(actionEvent -> {
+            new AddArticleDialogView(addArticleDialogViewModel, mainFrame).openAddArticleDialog();
+            shopMainView.activateArticleListPanel();
+        });
+
+        // ManageArticles/EditArticleStock
+        editStock.addActionListener(actionEvent -> {
+            new EditArticleStockDialogView(editArticleStockDialogViewModel, mainFrame).openEditArticleStockDialog();
+            shopMainView.activateArticleListPanel();
+        });
 
         // Open stock changes in ShopMainView
         stockChanges.addActionListener(actionEvent -> {
@@ -129,5 +138,6 @@ public class UIManager {
         staffMember.add(stockChanges);
 
         manageArticlesMenu.add(addArticles);
+        manageArticlesMenu.add(editStock);
     }
 }
