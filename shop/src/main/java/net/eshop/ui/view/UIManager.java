@@ -132,6 +132,10 @@ public class UIManager {
 
         mainFrame.setLayout(new BorderLayout());
         mainFrame.setTitle("Hamschter Inc.");
+        Image icon = Toolkit.getDefaultToolkit().getImage(
+                getClass().getClassLoader().getResource("Hamschter01_01.png")
+        );
+        mainFrame.setIconImage(icon);
 
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
