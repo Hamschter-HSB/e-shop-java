@@ -29,7 +29,7 @@ public class AddArticleToCartDialogView extends JDialog {
         JLabel description = new JLabel("Description:");
         JLabel price = new JLabel("Price:");
         JLabel bulkSize = new JLabel("Bulk size:");
-        SpinnerNumberModel model = new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1);
+        SpinnerNumberModel model = new SpinnerNumberModel(1, 1, selectedBulkArticle.getStock() / selectedBulkArticle.getBulkSize(), 1);
         JSpinner amountSpinner = new JSpinner(model);
 
         add(name);
