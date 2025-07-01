@@ -22,6 +22,7 @@ public class UIManager {
     private final Menu manageArticlesMenu = new Menu("Articles");
     private final MenuItem addArticles = new MenuItem("Add...");
     private final MenuItem stockChanges = new MenuItem("Stock changes");
+    private final MenuItem stockHistory = new MenuItem("Stock history");
     private final MenuItem editStock = new MenuItem("Edit stock...");
     private final MenuItem buyArticles = new MenuItem("Buy");
 
@@ -31,6 +32,7 @@ public class UIManager {
     private final ShopMainView shopMainView;
     private final AddArticleDialogViewModel addArticleDialogViewModel;
     private final EditArticleStockDialogViewModel editArticleStockDialogViewModel;
+    private final StockHistoryDialogViewModel stockHistoryDialogViewModel;
     private final AddArticleToCartDialogViewModel addArticleToCartDialogViewModel;
     private final ShowInvoiceDialogViewModel showInvoiceDialogViewModel;
 
@@ -44,6 +46,7 @@ public class UIManager {
 
         addArticleDialogViewModel = new AddArticleDialogViewModel(dataPersister);
         editArticleStockDialogViewModel = new EditArticleStockDialogViewModel(dataPersister);
+        stockHistoryDialogViewModel = new StockHistoryDialogViewModel(dataPersister);
         addArticleToCartDialogViewModel = new AddArticleToCartDialogViewModel(dataPersister);
         showInvoiceDialogViewModel = new ShowInvoiceDialogViewModel(dataPersister);
     }
@@ -115,6 +118,12 @@ public class UIManager {
             shopMainView.activateArticleListPanel();
         });
 
+        // ManageArticles/ShowStockHistory
+        stockHistory.addActionListener(actionEvent -> {
+            new StockHistoryDialogView(stockHistoryDialogViewModel, mainFrame).openStockHistoryDialog();
+            shopMainView.activateArticleListPanel();
+        });
+
         buyArticles.addActionListener(actionEvent -> {
             new ShowInvoiceDialogView(showInvoiceDialogViewModel, mainFrame).openShowInvoiceDialog();
             shopMainView.activateShoppingCartPanel();
@@ -130,6 +139,7 @@ public class UIManager {
             shopMainView.activateArticleListPanel();
         });
 
+        // Add articles in AddArticleToCartDisplayView
         shopMainView.setAddArticleToCartListener((int bulkArticleID) -> {
             new AddArticleToCartDialogView(addArticleToCartDialogViewModel, mainFrame).openAddArticleToCartDialog(bulkArticleID);
             shopMainView.activateArticleListPanel();
@@ -159,5 +169,6 @@ public class UIManager {
 
         manageArticlesMenu.add(addArticles);
         manageArticlesMenu.add(editStock);
+        manageArticlesMenu.add(stockHistory);
     }
 }
