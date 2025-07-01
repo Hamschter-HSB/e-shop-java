@@ -137,7 +137,7 @@ public class ArticleCUI {
 
         Random random = new Random();
         int id = random.nextInt(10000 - 1) + 1;
-        StockChange stockChange = new StockChange(id, LocalDateTime.now().getDayOfYear(), 0, articleNumber, bulkArticle.getStock(), Integer.parseInt(System.getProperty("CURRENT_USER_ID")));
+        StockChange stockChange = new StockChange(id, LocalDateTime.now().getDayOfYear(), articleNumber, 0, bulkArticle.getStock(), Integer.parseInt(System.getProperty("CURRENT_USER_ID")));
         dataPersister.createStockChange(stockChange);
 
         printArticleManagementMenu();
@@ -221,7 +221,7 @@ public class ArticleCUI {
 
         Random random = new Random();
         int stockChangeID = random.nextInt(10000 - 1) + 1;
-        StockChange stockChange = new StockChange(stockChangeID, LocalDateTime.now().getDayOfYear(), oldStock, id, bulkArticle.getStock(), Integer.parseInt(System.getProperty("CURRENT_USER_ID")));
+        StockChange stockChange = new StockChange(stockChangeID, LocalDateTime.now().getDayOfYear(), id, oldStock, bulkArticle.getStock(), Integer.parseInt(System.getProperty("CURRENT_USER_ID")));
         dataPersister.createStockChange(stockChange);
     }
 
