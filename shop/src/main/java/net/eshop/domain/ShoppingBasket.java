@@ -23,4 +23,8 @@ public class ShoppingBasket {
     public void addToArticleMap(Integer article, int amount) {
         this.article.put(article, amount);
     }
+
+    public void removeFromArticleMap(Integer article) {
+        this.article.remove(article);
+    }
 }

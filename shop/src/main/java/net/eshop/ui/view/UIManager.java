@@ -11,6 +11,8 @@ public class UIManager {
 
     private static final Logger logger = Logger.getLogger(UIManager.class.getName());
 
+    private final DataPersister dataPersister = new DataPersister();
+
     private final JFrame mainFrame = new JFrame("E-Shop");
     private final MenuBar menuBar = new MenuBar();
     private final Menu mainMenu = new Menu("Menu");
@@ -28,11 +30,10 @@ public class UIManager {
     private final ShopMainView shopMainView;
     private final AddArticleDialogViewModel addArticleDialogViewModel;
     private final EditArticleStockDialogViewModel editArticleStockDialogViewModel;
+    private final AddArticleToCartDialogViewModel addArticleToCartDialogViewModel;
 
 
     public UIManager() {
-
-        DataPersister dataPersister = new DataPersister();
 
         loginAndRegistrationViewModel = new LoginAndRegistrationViewModel(dataPersister);
         loginAndRegistrationView = new LoginAndRegistrationView(loginAndRegistrationViewModel);
@@ -42,6 +43,7 @@ public class UIManager {
 
         addArticleDialogViewModel = new AddArticleDialogViewModel(dataPersister);
         editArticleStockDialogViewModel = new EditArticleStockDialogViewModel(dataPersister);
+        addArticleToCartDialogViewModel = new AddArticleToCartDialogViewModel(dataPersister);
     }
 
     public void start() {
@@ -55,16 +57,15 @@ public class UIManager {
         loginAndRegistrationViewModel.setLoggedIn(() -> {
             mainFrame.add(shopMainViewJPanel);
 
+            // We have to do this call to solve the issue that the current user is not set, before a log ing.
+            // This causes that when a staff member logs in, he won't see the article stocks in the article list.
+            // This simple call fixes the article list for a staff member
+            shopMainView.activateArticleListPanelAfterLogIn();
+
             mainFrame.setMenuBar(menuBar);
 
-            if (ViewModelUtils.currentUserIsStaffMember()) {
+            if (ViewModelUtils.currentUserIsStaffMember())
                 menuBar.add(staffMember);
-
-                // We have to do this call to solve the issue that the current user is not set, before a log ing.
-                // This causes that when a staff member logs in, he won't see the article stocks in the article list.
-                // This simple call fixes the article list for a staff member
-                shopMainView.activateArticleListPanel();
-            }
         });
 
         shopMainViewModel.setRegisteredStaffMember(() -> mainFrame.add(shopMainViewJPanel));
@@ -116,6 +117,11 @@ public class UIManager {
 
         // Open articles in ShopMainView
         articles.addActionListener(actionEvent -> {
+            shopMainView.activateArticleListPanel();
+        });
+
+        shopMainView.setAddArticleToCartListener((int bulkArticleID) -> {
+            new AddArticleToCartDialogView(addArticleToCartDialogViewModel, mainFrame).openAddArticleToCartDialog(bulkArticleID);
             shopMainView.activateArticleListPanel();
         });
 
