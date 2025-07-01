@@ -66,6 +66,7 @@ public class LoginAndRegistrationViewModel {
 
         System.setProperty("CURRENT_USER", "CUSTOMER");
         System.setProperty("CURRENT_USER_ID", String.valueOf(newCustomer.getNumber()));
+        loginCustomer(customerId);
 
         logger.info("Registered customer " + userName + " successfully.");
     }
@@ -100,6 +101,7 @@ public class LoginAndRegistrationViewModel {
 
         System.setProperty("CURRENT_USER", "CUSTOMER");
         System.setProperty("CURRENT_USER_ID", String.valueOf(customer.getNumber()));
+        loginCustomer(customer.getNumber());
 
         if (loginListener != null)
             loginListener.onLoginSuccess();
@@ -148,6 +150,10 @@ public class LoginAndRegistrationViewModel {
                 logger.info("Login successfully for staff member " + userName);
             }
         });
+    }
+
+    public void loginCustomer(int customerID) {
+        dataPersister.setCurrentCustomer(customerID);
     }
 
     public void setLoggedIn(LoginListener loginListener) {

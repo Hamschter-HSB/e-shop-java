@@ -10,7 +10,9 @@ import net.eshop.ui.events.LogoutListener;
 import net.eshop.ui.events.RegistrationListener;
 
 import javax.swing.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
@@ -118,6 +120,34 @@ public class ShopMainViewModel {
         });
 
         return table;
+    }
+
+    public String[][] loadShoppingCart() {
+
+        Map<BulkArticle, Integer> articleAndAmount = new HashMap<>();
+
+        dataPersister.getCustomer().getShoppingBasket().getArticleMap().forEach((key, value) -> {
+            BulkArticle bulkArticle = dataPersister.readBulkArticle(key);
+            articleAndAmount.put(bulkArticle, value);
+        });
+
+        String[][] table = new String[articleAndAmount.size()][5];
+        AtomicInteger counter = new AtomicInteger(0);
+
+        articleAndAmount.forEach((bulkArticle, amount) -> {
+            table[counter.get()][0] = String.valueOf(bulkArticle.getArticleNumber());
+            table[counter.get()][1] = String.valueOf(bulkArticle.getName());
+            table[counter.get()][2] = String.valueOf(bulkArticle.getDescription());
+            table[counter.get()][3] = String.valueOf(bulkArticle.getPrice());
+            table[counter.get()][4] = String.valueOf(amount);
+            counter.incrementAndGet();
+        });
+
+        return table;
+    }
+
+    public void removeArticleFromCart(int articleID) {
+        dataPersister.getCustomer().getShoppingBasket().removeFromArticleMap(articleID);
     }
 
     public void setRegisteredStaffMember(RegistrationListener registrationListener) {
