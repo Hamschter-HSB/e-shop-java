@@ -25,9 +25,7 @@ public class DataPersister {
     private final DAO<Customer> customerDAO = new CustomerFileDAOImpl();
     private final DAO<StockChange> stockChangeDAO = new StockChangeDAOImpl();
 
-    // TODO REMOVE and use own DAO. Temporary code
-    int currentUserId = 1;
-    private final Customer customer = readCustomer(currentUserId);
+    private Customer customer;
 
     /* (Bulk)-Article */
 
@@ -160,6 +158,10 @@ public class DataPersister {
     // TODO REMOVE and use own DAO. Temporary code
     public Customer getCustomer() {
         return customer;
+    }
+
+    public void setCurrentCustomer(int customerID) {
+        customer = readCustomer(customerID);
     }
 
     public List<Customer> readAllCustomers() {

@@ -91,7 +91,7 @@ public class LoginAndRegistrationView {
         Dimension buttonDimension = new Dimension(200, 35);
 
         // Registration and login for customer
-        registerButton.addActionListener(actionEvent -> loginAndRegistrationViewModel.registerButtonClickHandler(userNameTextField.getText(), passwordField.getPassword(), addressTextField.getText(),registrationMainPanel));
+        registerButton.addActionListener(actionEvent -> loginAndRegistrationViewModel.registerButtonClickHandler(userNameTextField.getText(), passwordField.getPassword(), addressTextField.getText(), registrationMainPanel));
 
         // Back to log in
         backButton.addActionListener(actionEvent -> {
