@@ -23,6 +23,7 @@ public class UIManager {
     private final MenuItem addArticles = new MenuItem("Add...");
     private final MenuItem stockChanges = new MenuItem("Stock changes");
     private final MenuItem editStock = new MenuItem("Edit stock...");
+    private final MenuItem buyArticles = new MenuItem("Buy");
 
     private final LoginAndRegistrationViewModel loginAndRegistrationViewModel;
     private final LoginAndRegistrationView loginAndRegistrationView;
@@ -31,7 +32,7 @@ public class UIManager {
     private final AddArticleDialogViewModel addArticleDialogViewModel;
     private final EditArticleStockDialogViewModel editArticleStockDialogViewModel;
     private final AddArticleToCartDialogViewModel addArticleToCartDialogViewModel;
-
+    private final ShowInvoiceDialogViewModel showInvoiceDialogViewModel;
 
     public UIManager() {
 
@@ -44,6 +45,7 @@ public class UIManager {
         addArticleDialogViewModel = new AddArticleDialogViewModel(dataPersister);
         editArticleStockDialogViewModel = new EditArticleStockDialogViewModel(dataPersister);
         addArticleToCartDialogViewModel = new AddArticleToCartDialogViewModel(dataPersister);
+        showInvoiceDialogViewModel = new ShowInvoiceDialogViewModel(dataPersister);
     }
 
     public void start() {
@@ -66,6 +68,8 @@ public class UIManager {
 
             if (ViewModelUtils.currentUserIsStaffMember())
                 menuBar.add(staffMember);
+            else
+                mainMenu.add(buyArticles);
         });
 
         shopMainViewModel.setRegisteredStaffMember(() -> mainFrame.add(shopMainViewJPanel));
@@ -79,6 +83,7 @@ public class UIManager {
 
                     mainFrame.setMenuBar(null);
                     menuBar.remove(staffMember);
+                    mainMenu.remove(buyArticles);
                 }
         );
 
@@ -108,6 +113,11 @@ public class UIManager {
         editStock.addActionListener(actionEvent -> {
             new EditArticleStockDialogView(editArticleStockDialogViewModel, mainFrame).openEditArticleStockDialog();
             shopMainView.activateArticleListPanel();
+        });
+
+        buyArticles.addActionListener(actionEvent -> {
+            new ShowInvoiceDialogView(showInvoiceDialogViewModel, mainFrame).openShowInvoiceDialog();
+            shopMainView.activateShoppingCartPanel();
         });
 
         // Open stock changes in ShopMainView

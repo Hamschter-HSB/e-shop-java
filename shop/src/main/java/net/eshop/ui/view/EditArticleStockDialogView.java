@@ -33,7 +33,7 @@ public class EditArticleStockDialogView extends JDialog {
         BulkArticle selectedItem = allArticlesHashMap.get(articleID.getSelectedItem());
         JLabel articleName = new JLabel(selectedItem.getName());
 
-        SpinnerNumberModel model = new SpinnerNumberModel(selectedItem.getStock(), 0, Integer.MAX_VALUE, 1);
+        SpinnerNumberModel model = new SpinnerNumberModel(selectedItem.getStock(), 0, Integer.MAX_VALUE, selectedItem.getBulkSize());
         JSpinner stock = new JSpinner(model);
 
         articleID.addActionListener(actionEvent -> {
