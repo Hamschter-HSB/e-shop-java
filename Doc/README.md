@@ -1,1 +1,0 @@
-This folöder contains UML Diagramms for this project.
